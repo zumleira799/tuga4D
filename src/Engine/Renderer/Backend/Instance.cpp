@@ -9,6 +9,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         CreateInstance(appName);
     }
 
+    Instance::~Instance(){
+        vkDestroyInstance(instance, NULL);
+    }
+
     void Instance::CreateInstance(const std::string& appName) {
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
