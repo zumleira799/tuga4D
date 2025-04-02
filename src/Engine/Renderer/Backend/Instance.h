@@ -14,6 +14,10 @@ namespace tuga4d::Engine::Renderer {
         class Instance : NoCopy, NoMove {
         public:
             Instance(int versionMajor, int versionMinor, int versionPatch, const std::string& appName);
+
+            VkInstance GetInstance() {
+                return instance;
+            }
         private:
             void CreateInstance(const std::string& appName);
 
