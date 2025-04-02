@@ -14,6 +14,9 @@ namespace tuga4d::Engine::Renderer::Backend {
     public:
         Instance(int versionMajor, int versionMinor, int versionPatch, const std::string& appName);
         ~Instance();
+        VkInstance GetInstance() {
+            return instance;
+        }
     private:
         void CreateInstance(const std::string& appName);
 
