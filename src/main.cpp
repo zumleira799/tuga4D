@@ -1,17 +1,21 @@
 #include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 #include <iostream>
 
 int main() {
 	VkInstance instance;
-
+	if(glfwInit()==0){
+		printf("dumbass\n");
+		return -1;
+	}
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.pEngineName = "tuga4D";
-	appInfo.pApplicationName = "Minha applicação tuga";
+	appInfo.pApplicationName = "Minha applicaï¿½ï¿½o tuga";
 
 	VkInstanceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;

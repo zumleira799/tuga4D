@@ -49,10 +49,10 @@ if(WIN32)
       "$<$<CONFIG:Debug>:/JMC>"
     )
     add_definitions(-DUNICODE -D_UNICODE -_CPPUNWIND)
-    add_compile_options(-mfpmath=sse -msse2)
+    add_compile_options(/arch:SSE2)
 endif(WIN32)
 if (UNIX)
-    add_compile_options(/arch:SSE)
+    add_compile_options(-mfpmath=sse -msse2)
 endif(UNIX)
 
 add_compile_options(

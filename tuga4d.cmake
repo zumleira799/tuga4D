@@ -22,7 +22,7 @@ set_target_properties("tuga4d" PROPERTIES
 find_package(Vulkan REQUIRED)
 if (UNIX)
 find_package(glfw3 REQUIRED)
-else
+else()
 add_subdirectory("vendor/glfw")
 endif()
 add_subdirectory("vendor/glm")
