@@ -19,9 +19,12 @@ set_target_properties("tuga4d" PROPERTIES
   POSITION_INDEPENDENT_CODE False
   INTERPROCEDURAL_OPTIMIZATION False
 )
-
 find_package(Vulkan REQUIRED)
+if (UNIX)
+find_package(glfw3 REQUIRED)
+else
 add_subdirectory("vendor/glfw")
+endif()
 add_subdirectory("vendor/glm")
 
 target_include_directories("tuga4d"  
