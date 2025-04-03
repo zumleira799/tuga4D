@@ -12,11 +12,10 @@ namespace tuga4d::Engine::Renderer::Backend {
 			VkPhysicalDevice physicalDevice;
 			VkDevice device;
 
-			int findQueueFamilies(VkPhysicalDevice phsD);
-
+			int findQueueFamilies(VkPhysicalDevice phsD, bool* foundAny);
 			bool checkDeviceExtensionSupport(VkPhysicalDevice physD, std::vector<char*> checkExt);
-
-			bool isDeviceSuitable(VkPhysicalDevice dev1);
-			void pickPhysicalDevice(VkInstance inst);
+			bool isDeviceSuitable(VkPhysicalDevice dev1, std::vector<char*> reqExt);
+			void pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt);
+			void createLogicalDevice();
 	};
 }
