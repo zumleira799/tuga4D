@@ -12,6 +12,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         bool IsOk() const {
             return sampler != VK_NULL_HANDLE;
         }
+    protected:
+        void OnDestruct();
     private:
         VkSampler sampler;
     };

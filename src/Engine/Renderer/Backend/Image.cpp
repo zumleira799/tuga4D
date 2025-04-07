@@ -1,5 +1,6 @@
 #include "Image.h"
 #include <Core/Logger.h>
+#include <cassert>
 
 namespace tuga4d::Engine::Renderer::Backend {
     Image::Builder::Builder(VkImageType imageType) {
@@ -36,16 +37,16 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.usage |= usages;
         return *this;
     }
-    Image* Image::Builder::Build(Device& device, const char* debugName) {
+    Image* Image::Builder::Build(Device& device, const std::string& debugName) {
         return new Image(device, debugName, createInfo);
     }
-    Image::Image(Device& device, const char* debugName, const VkImageCreateInfo& createInfo)
+    Image::Image(Device& device, const std::string& debugName, const VkImageCreateInfo& createInfo)
         : device(device), createInfo(createInfo) {
 
         // TODO, come back to this to implement the rest of the struct
         VmaAllocationCreateInfo allocInfo{};
         allocInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
-        assert(false && "TODO");
+        assert(false && "FIXME");
 
         VkResult result = vmaCreateImage(device.GetMemoryAllocator(), &createInfo, &allocInfo, &image, &memory, nullptr);
         if (result != VK_SUCCESS) {
@@ -53,7 +54,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
         CreateDebugInfo(device, debugName, (uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT);
     }
-    Image::~Image() {
+    void Image::OnDestruct() {
         vmaFreeMemory(device.GetMemoryAllocator(), memory);
         vkDestroyImage(device.GetDevice(), image, nullptr);
     }

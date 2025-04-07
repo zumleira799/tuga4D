@@ -1,5 +1,6 @@
 #include "Buffer.h"
 #include <Core/Logger.h>
+#include <cassert>
 
 namespace tuga4d::Engine::Renderer::Backend {
     VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
@@ -32,10 +33,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.usage |= usages;
         return *this;
     }
-    Buffer* Buffer::Builder::Build(Device& device, const char* debugName) {
-        return new Buffer(device, debugName, createInfo);
+    Buffer* Buffer::Builder::Build(Device& device, const std::string& debugName) {
+        return new Buffer(device, debugName, createInfo, memoryUsage);
     }
-    Buffer::Buffer(Device& device, const char* debugName, const VkBufferCreateInfo& createInfo)
+    Buffer::Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage)
         : device(device) {
         // hey vasco, it's me tristan, i actually forgot what this is for, 
         // but im pretty sure you dont ever need it to be anything other than 1
@@ -43,9 +44,11 @@ namespace tuga4d::Engine::Renderer::Backend {
         alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
         bufferSize = alignmentSize * instanceCount;
 
+        this->memoryUsage = memoryUsage;
         // TODO, unlike images, buffers make sense to allocate host side. Make sure to implement properly.
         VmaAllocationCreateInfo allocInfo{};
         allocInfo.usage = memoryUsage;
+        assert(false && "FIXME");
 
         VkResult result = vmaCreateBuffer(device.GetMemoryAllocator(), &createInfo, &allocInfo, &buffer, &memory, nullptr);
         if (result != VK_SUCCESS) {
@@ -53,7 +56,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
         CreateDebugInfo(device, debugName, (uint64_t)buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT);
     }
-    Buffer::~Buffer() {
+    void Buffer::OnDestruct() {
         Unmap();
         vmaFreeMemory(device.GetMemoryAllocator(), memory);
         vkDestroyBuffer(device.GetDevice(), buffer, nullptr);
@@ -82,19 +85,25 @@ namespace tuga4d::Engine::Renderer::Backend {
 
    
     VkResult Buffer::Flush(VkDeviceSize offset, VkDeviceSize size) {
+        VmaAllocationInfo allocInfo;
+        vmaGetAllocationInfo(device.GetMemoryAllocator(), memory, &allocInfo);
+
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-        mappedRange.memory = memory->GetMemory();
-        mappedRange.offset = memory->GetOffset() + offset;
+        mappedRange.memory = allocInfo.deviceMemory;
+        mappedRange.offset = allocInfo.offset + offset;
         mappedRange.size = size;
-        return vkFlushMappedMemoryRanges(engineDevice.device(), 1, &mappedRange);
+        return vkFlushMappedMemoryRanges(device.GetDevice(), 1, &mappedRange);
     }
 
     VkResult Buffer::Invalidate(VkDeviceSize offset, VkDeviceSize size) {
+        VmaAllocationInfo allocInfo;
+        vmaGetAllocationInfo(device.GetMemoryAllocator(), memory, &allocInfo);
+
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-        mappedRange.memory = memory->GetMemory();
-        mappedRange.offset = memory->GetOffset() + offset;
+        mappedRange.memory = allocInfo.deviceMemory;
+        mappedRange.offset = allocInfo.offset + offset;
         mappedRange.size = size;
         return vkInvalidateMappedMemoryRanges(device.GetDevice(), 1, &mappedRange);
     }

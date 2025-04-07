@@ -26,6 +26,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
+        
+        // FIXME: add required extensions to the instance!
 
         if (VkResult result = vkCreateInstance(&createInfo, nullptr, &instance); result == VK_SUCCESS) {
             Logger::Trace("Created vulkan instance");

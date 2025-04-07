@@ -14,12 +14,11 @@ namespace tuga4d::Engine::Renderer::Backend {
             Builder& SetMipCount(uint32_t numMips);
             Builder& SetSampleCount(VkSampleCountFlagBits samples);
             Builder& AddUsageFlags(VkImageUsageFlags usages);
-            Image* Build(Device& device, const char* debugName);
+            Image* Build(Device& device, const std::string& debugName);
         private:
             VkImageCreateInfo createInfo{ VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
         };
-        Image(Device& device, const char* debugName, const VkImageCreateInfo& createInfo);
-        ~Image();
+        Image(Device& device, const std::string& debugName, const VkImageCreateInfo& createInfo);
 
         bool IsOk() const {
             return image != VK_NULL_HANDLE;
@@ -52,6 +51,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         uint32_t GetMipCount() const {
             return createInfo.mipLevels;
         }
+    protected:
+        void OnDestruct();
     private:
         Device& device;
         VkImageCreateInfo createInfo;

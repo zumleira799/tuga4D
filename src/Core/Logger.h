@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdio>
 #include <string>
+#include <stdexcept>
 
 namespace tuga4d {
     struct Logger {

@@ -19,13 +19,12 @@ namespace tuga4d::Engine::Renderer::Backend {
             
             Builder& SetMemoryUsage(BufferMemoryUsage usage);
             Builder& AddUsageFlags(VkBufferUsageFlags usages);
-            Buffer* Build(Device& device, const char* debugName);
+            Buffer* Build(Device& device, const std::string& debugName);
         private:
             VkBufferCreateInfo createInfo{ VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
             VmaMemoryUsage memoryUsage;
         };
-        Buffer(Device& device, const char* debugName, const VkBufferCreateInfo& createInfo);
-        ~Buffer();
+        Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage);
         
         /**
          * Map a memory range of this buffer. If successful, mapped points to the specified buffer range.
@@ -111,10 +110,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkResult InvalidateIndex(int index);
 
         void* GetMappedMemory() { 
-            return (void*)((char*)mappedMemory + mappedOffset); 
+            return (void*)((char*)mappedMemory); 
         }
         void* GetMappedIndex(int index) { 
-            return (void*)((char*)mappedMemory + mappedOffset + index * alignmentSize);
+            return (void*)((char*)mappedMemory + index * alignmentSize);
         }
 
         VkDeviceSize getInstanceSize() const {
@@ -123,11 +122,11 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkDeviceSize getAlignmentSize() const { 
             return alignmentSize; 
         }
-        VkBufferUsageFlags getUsageFlags() const { 
-            return usageFlags; 
+        VkBufferUsageFlags getBufferUsageFlags() const { 
+            return bufferUsage; 
         }
-        VkMemoryPropertyFlags getMemoryPropertyFlags() const { 
-            return memoryPropertyFlags; 
+        VmaMemoryUsage getMemoryUsagelags() const { 
+            return memoryUsage; 
         }
         VkDeviceSize getBufferSize() const { 
             return bufferSize; 
@@ -145,6 +144,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         size_t GetInstanceCount() const { 
             return instanceCount;
         }
+    protected:
+        void OnDestruct();
     private:
         void* mappedMemory = nullptr;
         VkDeviceSize bufferSize;
@@ -152,6 +153,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkDeviceSize instanceSize;
         VkDeviceSize alignmentSize;
         
+        VkBufferUsageFlags bufferUsage;
+        VmaMemoryUsage memoryUsage;
+
         Device& device;
         VkBuffer buffer;
         VmaAllocation memory;

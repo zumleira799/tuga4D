@@ -1,21 +1,36 @@
 #pragma once
 #include <Core/Util.h>
-#include <string>
 #include <vulkan/vulkan.h>
+#include <string>
+#include <vector>
+#include <vma/vk_mem_alloc.h>
 
 namespace tuga4d::Engine::Renderer::Backend {
-	class Device : NoCopy, NoMove {
-		public:
-			Device(Instance& instance, )
-		private:
-			Instance cInstance;
-			VkPhysicalDevice physicalDevice;
-			VkDevice device;
+    class Instance;
+    class Device : NoCopy, NoMove {
+    public:
+        Device(Instance& instance);
+        ~Device();
 
-			int findQueueFamilies(VkPhysicalDevice phsD, bool* foundAny);
-			bool checkDeviceExtensionSupport(VkPhysicalDevice physD, std::vector<char*> checkExt);
-			bool isDeviceSuitable(VkPhysicalDevice dev1, std::vector<char*> reqExt);
-			void pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt);
-			void createLogicalDevice();
-	};
+        VkDevice GetDevice() {
+            return device;
+        }
+        VkPhysicalDevice GetPhysicalDevice() {
+            return physicalDevice;
+        }
+        VmaAllocator GetMemoryAllocator() {
+            return memoryAllocator;
+        }
+        const char* GetDeviceName() {
+            return "FIXME";
+        }
+    private:
+        Instance& cInstance;
+        VkPhysicalDevice physicalDevice;
+        VkDevice device;
+        VmaAllocator memoryAllocator = nullptr;
+
+        void pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt);
+        void createLogicalDevice();
+    };
 }

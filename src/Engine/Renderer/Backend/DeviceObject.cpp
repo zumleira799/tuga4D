@@ -5,15 +5,18 @@
 #include <typeinfo>
 
 namespace tuga4d::Engine::Renderer::Backend{
-    void DeviceObject::CreateDebugInfo(Device& device, const char* debugName,
+    DeviceObject::~DeviceObject() {
+       // device.DestroyLater(this);
+    }
+    void DeviceObject::CreateDebugInfo(Device& device, const std::string& debugName,
         uint64_t object, VkDebugReportObjectTypeEXT objectType) {
         this->debugName = debugName;
         if (!ENABLE_DEBUG_VALIDATION) return;
-        if (debugName) {
+        if (!debugName.empty()) {
             VkDebugMarkerObjectNameInfoEXT objectInfo{ VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT };
             objectInfo.object = object;
             objectInfo.objectType = objectType;
-            objectInfo.pObjectName = debugName;
+            objectInfo.pObjectName = debugName.c_str();
             objectInfo.pNext = nullptr;
             if (VkResult result = vkDebugMarkerSetObjectNameEXT(device.GetDevice(), &objectInfo); result != VK_SUCCESS) {
                 Logger::Warning("Failed to set vulkan object debug name! VkResult: %i", static_cast<int>(result));

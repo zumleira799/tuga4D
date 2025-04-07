@@ -1,23 +1,25 @@
 #pragma once
 #include <Core/Util.h>
 #include <vulkan/vulkan.h>
+#include <string>
 
 namespace tuga4d::Engine::Renderer::Backend {
     class Device;
     class DeviceObject : NoCopy, NoMove {
     public:
         DeviceObject() = default;
-        virtual ~DeviceObject() {}
+        ~DeviceObject();
         const char* GetDebugName() {
-            return debugName ? "Missing Debug Name" : debugName;
+            return debugName.empty() ? "Missing Debug Name" : debugName.c_str();
         }
 
         // returns if the resource is valid
         virtual bool IsOk() const = 0;
     protected:
-        void CreateDebugInfo(Device& device, const char* debugName,
+        virtual void OnDestruct() = 0;
+        void CreateDebugInfo(Device& device, const std::string& debugName,
             uint64_t object, VkDebugReportObjectTypeEXT objectType);
     private:
-        const char* debugName;
+        std::string debugName;
     };
 }

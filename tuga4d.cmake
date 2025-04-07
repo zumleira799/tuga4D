@@ -1,7 +1,9 @@
 ﻿set(SH_SRC "${CMAKE_SOURCE_DIR}/src")
 file(GLOB_RECURSE ENDF6_SRC
+      "${SH_SRC}/*.hpp"
       "${SH_SRC}/*.h"
-      "${SH_SRC}/*.cpp")
+      "${SH_SRC}/*.cpp"
+      "${SH_SRC}/*.c")
       
 add_executable("tuga4d" ${ENDF6_SRC})
 

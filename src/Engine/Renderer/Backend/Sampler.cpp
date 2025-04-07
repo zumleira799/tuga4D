@@ -4,5 +4,7 @@
 
 
 namespace tuga4d::Engine::Renderer::Backend {
-   
+    void Sampler::OnDestruct() {
+
+    }
 }

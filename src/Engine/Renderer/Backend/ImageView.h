@@ -10,13 +10,12 @@ namespace tuga4d::Engine::Renderer::Backend {
             Builder& SetMipRange(uint32_t firstMip, uint32_t numMips);
             Builder& AddAspectFlag(VkImageAspectFlags aspects);
             Builder& MapComponents(VkComponentSwizzle r, VkComponentSwizzle g, VkComponentSwizzle b, VkComponentSwizzle a);
-            ImageView* Build(Device& device, const char* debugName);
+            ImageView* Build(Device& device, const std::string& debugName);
         private:
             VkImageViewCreateInfo createInfo{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
             Image* image;
         };
-        ImageView(Device& device, const char* debugName, const VkImageViewCreateInfo& createInfo);
-        ~ImageView();
+        ImageView(Device& device, const std::string& debugName, const VkImageViewCreateInfo& createInfo);
 
         bool IsOk() const {
             return imageView != VK_NULL_HANDLE;
@@ -43,6 +42,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         uint32_t GetBaseMipIndex() const {
             return createInfo.subresourceRange.baseMipLevel;
         }
+    protected:
+        void OnDestruct();
     private:
         Device& device;
         VkImageViewCreateInfo createInfo;

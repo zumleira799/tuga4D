@@ -23,5 +23,5 @@ namespace tuga4d::Engine::Renderer::Backend {
         int vEngineMajor, vEngineMinor, vEnginePatch;
 
         VkInstance instance;
-    }
+    };
 }

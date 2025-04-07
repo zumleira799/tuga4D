@@ -1,5 +1,6 @@
 #include "ImageView.h"
 #include <Core/Logger.h>
+#include <cassert>
 
 namespace tuga4d::Engine::Renderer::Backend {
     ImageView::Builder::Builder(Image& image, VkImageViewType imageType) : image(&image) {
@@ -35,10 +36,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.components.a = a;
         return *this;
     }
-    ImageView* ImageView::Builder::Build(Device& device, const char* debugName) {
+    ImageView* ImageView::Builder::Build(Device& device, const std::string& debugName) {
         return new ImageView(device, debugName, createInfo);
     }
-    ImageView::ImageView(Device& device, const char* debugName, const VkImageViewCreateInfo& createInfo)
+    ImageView::ImageView(Device& device, const std::string& debugName, const VkImageViewCreateInfo& createInfo)
         : device(device), createInfo(createInfo) {
         VkResult result = vkCreateImageView(device.GetDevice(), &createInfo, nullptr, &imageView);
         if (result != VK_SUCCESS) {
@@ -46,7 +47,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
         CreateDebugInfo(device, debugName, (uint64_t)imageView, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT);
     }
-    ImageView::~ImageView() {
+    void ImageView::OnDestruct() {
         vkDestroyImageView(device.GetDevice(), imageView, nullptr);
     }
 }
