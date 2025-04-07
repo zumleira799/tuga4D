@@ -48,4 +48,4 @@ set_target_properties("tuga4d" PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_PATH}
 )
 
-target_link_libraries("tuga4d" glfw volk ${GLFW_LIBRARIES} Vulkan::Vulkan)
+target_link_libraries("tuga4d" glfw ${GLFW_LIBRARIES} volk)
