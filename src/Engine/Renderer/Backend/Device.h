@@ -1,6 +1,6 @@
 #pragma once
 #include <Core/Util.h>
-#include <vulkan/vulkan.h>
+#include <volk/volk.h>
 #include <string>
 #include <vector>
 #include <vma/vk_mem_alloc.h>
@@ -29,6 +29,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDevice physicalDevice;
         VkDevice device;
         VmaAllocator memoryAllocator = nullptr;
+        VkPhysicalDeviceFeatures deviceFeatures;
 
         void pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt);
         void createLogicalDevice();

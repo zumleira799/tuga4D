@@ -28,6 +28,7 @@ else()
 add_subdirectory("vendor/glfw")
 endif()
 add_subdirectory("vendor/glm")
+add_subdirectory("vendor/volk")
 
 target_include_directories("tuga4d"  
   PRIVATE ${CMAKE_SOURCE_DIR}/src
@@ -47,4 +48,4 @@ set_target_properties("tuga4d" PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_PATH}
 )
 
-target_link_libraries("tuga4d" glfw ${GLFW_LIBRARIES} Vulkan::Vulkan)
+target_link_libraries("tuga4d" glfw volk ${GLFW_LIBRARIES} Vulkan::Vulkan)

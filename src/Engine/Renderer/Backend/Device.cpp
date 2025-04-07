@@ -22,13 +22,13 @@ namespace tuga4d::Engine::Renderer::Backend {
         free(queueFamProp);
         return false;
     }
-    static bool checkDeviceExtensionSupport(VkPhysicalDevice physD, std::vector<char*> checkExt) {
+    static bool checkDeviceExtensionSupport(VkPhysicalDevice physD, char** checkExt, int chSize) {
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(physD, NULL, &extensionCount, NULL);
         VkExtensionProperties* dExtProp = (VkExtensionProperties*)malloc(extensionCount * sizeof(VkExtensionProperties));
         vkEnumerateDeviceExtensionProperties(physD, NULL, &extensionCount, dExtProp);
 
-        for (int i = 0; i < checkExt.size(); i++) {
+        for (int i = 0; i < chSize; i++) {
             for (int k = 0; k < extensionCount; k++) {
                 if (strcmp(checkExt[i], dExtProp[k].extensionName)) {
                     goto found;
@@ -46,7 +46,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     static bool isDeviceSuitable(VkPhysicalDevice dev1, std::vector<char*> reqExt) {
         uint32_t index;
         bool fnd = findQueueFamilies(dev1, &index);
-        bool iS = checkDeviceExtensionSupport(dev1, reqExt);
+        bool iS = checkDeviceExtensionSupport(dev1, reqExt.data(), reqExt.size());
         //figure out what to do with querying for swapchain support later
         return fnd && iS;
     }
@@ -59,7 +59,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     Device::~Device() {
-        vkDestroyDevice(device, nullptr);
+        vkDestroyDevice(device, VK_NULL_HANDLE);
     }
 
 
@@ -74,15 +74,20 @@ namespace tuga4d::Engine::Renderer::Backend {
         for (int i = 0; i < deviceCount; i++) {
             if (isDeviceSuitable(phsDevices[i], reqExt)) {
                 this->physicalDevice = phsDevices[i];
+                free(phsDevices);
                 return;
             }
         }
+        free(phsDevices);
         throw std::runtime_error("No suitable GPUs\n");
     }
 
     void Device::createLogicalDevice() {
         uint32_t index;
         findQueueFamilies(this->physicalDevice, &index);
+
+        VkDeviceCreateInfo deviceCreateInfo{};
+        deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -91,7 +96,11 @@ namespace tuga4d::Engine::Renderer::Backend {
         float queuePriority = 1.0f;
         queueCreateInfo.pQueuePriorities = &queuePriority;
 
-        VkPhysicalDeviceFeatures deviceFeatures{};
+        deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+        deviceCreateInfo.queueCreateInfoCount = 1;
 
+        vkCreateDevice(physicalDevice, &deviceCreateInfo, NULL, &device);
+
+        volkLoadDevice(device);
     }
 }

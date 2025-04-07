@@ -6,6 +6,7 @@
 namespace tuga4d::Engine::Renderer::Backend {
     Instance::Instance(int versionMajor, int versionMinor, int versionPatch, const std::string& appName) 
     : vEngineMajor(versionMajor), vEngineMinor(versionMinor), vEnginePatch(versionPatch) {
+        volkInitialize();
         CreateInstance(appName);
     }
 
@@ -14,6 +15,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     void Instance::CreateInstance(const std::string& appName) {
+
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -34,5 +36,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         } else {
             throw std::runtime_error("failed to create vulkan instance!");
         }
+        volkLoadInstance(instance);
     }
 }
