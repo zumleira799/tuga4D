@@ -22,7 +22,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         free(queueFamProp);
         return false;
     }
-    static bool checkDeviceExtensionSupport(VkPhysicalDevice physD, char** checkExt, int chSize) {
+    static bool checkDeviceExtensionSupport(VkPhysicalDevice physD, std::vector<char*> checkExt, int chSize) {
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(physD, NULL, &extensionCount, NULL);
         VkExtensionProperties* dExtProp = (VkExtensionProperties*)malloc(extensionCount * sizeof(VkExtensionProperties));
@@ -82,7 +82,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         throw std::runtime_error("No suitable GPUs\n");
     }
 
-    void Device::createLogicalDevice() {
+    void Device::createLogicalDevice(std::vector<char*> reqExt) {
         uint32_t index;
         findQueueFamilies(this->physicalDevice, &index);
 
@@ -99,8 +99,15 @@ namespace tuga4d::Engine::Renderer::Backend {
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.queueCreateInfoCount = 1;
 
+        VkPhysicalDeviceFeatures deviceFeatures{};
+
+
+
         vkCreateDevice(physicalDevice, &deviceCreateInfo, NULL, &device);
 
         volkLoadDevice(device);
+
+
+
     }
 }
