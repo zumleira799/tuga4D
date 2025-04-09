@@ -1,6 +1,7 @@
 #include "Buffer.h"
 #include <Core/Logger.h>
 #include <cassert>
+#include <cstring>
 
 namespace tuga4d::Engine::Renderer::Backend {
     VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {

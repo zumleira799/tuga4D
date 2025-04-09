@@ -3,6 +3,7 @@
 #include <Core/Logger.h>
 #include <stdexcept>
 #include <cassert>
+#include <cstring>
 
 namespace tuga4d::Engine::Renderer::Backend {
     // Returns graphics queue index if found
@@ -51,10 +52,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         return fnd && iS;
     }
 
-    Device::Device(Instance& instance) : cInstance(instance) {
-
-        pickPhysicalDevice(instance.GetInstance(), /*required extensions*/);
-        createLogicalDevice(/*required extensions*/);
+    Device::Device(Instance& instance, const std::vector<char*>&reqExt) : cInstance(instance) {
+        pickPhysicalDevice(instance.GetInstance(), reqExt);
+        createLogicalDevice(reqExt);
         Logger::Trace("Created device %s", GetDeviceName());
     }
 
@@ -101,7 +101,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 
         deviceCreateInfo.enabledExtensionCount = reqExt.size();
         deviceCreateInfo.ppEnabledExtensionNames = reqExt.data();
-        deviceCreateInfo.pEnabledFeatures = deviceFeatures;
+        deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 
         vkCreateDevice(physicalDevice, &deviceCreateInfo, NULL, &device);
 

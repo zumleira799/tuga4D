@@ -9,7 +9,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     class Instance;
     class Device : NoCopy, NoMove {
     public:
-        Device(Instance& instance);
+        Device(Instance& instance, const std::vector<char*>& reqExt);
         ~Device();
 
         VkDevice GetDevice() {
@@ -29,7 +29,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDevice physicalDevice;
         VkDevice device;
         VmaAllocator memoryAllocator = nullptr;
-        VkPhysicalDeviceFeatures deviceFeatures;
+        VkPhysicalDeviceFeatures deviceFeatures{};
         VkQueue graphicsQueue;
 
         void pickPhysicalDevice(VkInstance inst, const std::vector<char*>& reqExt);
