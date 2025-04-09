@@ -32,7 +32,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDeviceFeatures deviceFeatures;
         VkQueue graphicsQueue;
 
-        void pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt);
-        void createLogicalDevice();
+        void pickPhysicalDevice(VkInstance inst, const std::vector<char*>& reqExt);
+        void createLogicalDevice(const std::vector<char*>& reqExt);
     };
 }
