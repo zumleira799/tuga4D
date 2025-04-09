@@ -1,7 +1,7 @@
 #pragma once
 #include <Core/Util.h>
 #include <string>
-#include <volk/volk.h>
+#include <volk.h>
 
 #ifdef NDEBUG
 constexpr bool ENABLE_DEBUG_VALIDATION = false;

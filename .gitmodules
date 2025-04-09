@@ -7,3 +7,6 @@
 [submodule "vendor/volk"]
 	path = vendor/volk
 	url = https://github.com/zeux/volk
+[submodule "vendor/VulkanMemoryAllocator"]
+	path = vendor/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
