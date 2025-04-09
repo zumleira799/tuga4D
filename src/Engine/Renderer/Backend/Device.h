@@ -1,9 +1,9 @@
 #pragma once
 #include <Core/Util.h>
-#include <volk/volk.h>
+#include <volk.h>
 #include <string>
 #include <vector>
-#include <vma/vk_mem_alloc.h>
+#include <vk_mem_alloc.h>
 
 namespace tuga4d::Engine::Renderer::Backend {
     class Instance;

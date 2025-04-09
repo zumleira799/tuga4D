@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Renderer/Backend/Instance.h>
 #include <string>
-#include <volk/volk.h>
+#include <volk.h>
 
 extern "C" {
     typedef struct GLFWwindow;

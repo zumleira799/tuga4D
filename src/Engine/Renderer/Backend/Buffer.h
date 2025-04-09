@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Renderer/Backend/Device.h>
 #include <Engine/Renderer/Backend/DeviceObject.h>
-#include <vma/vk_mem_alloc.h>
+#include <vk_mem_alloc.h>
 #include <cstdlib>
 
 namespace tuga4d::Engine::Renderer::Backend {
