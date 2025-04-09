@@ -30,6 +30,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkDevice device;
         VmaAllocator memoryAllocator = nullptr;
         VkPhysicalDeviceFeatures deviceFeatures;
+        VkQueue graphicsQueue;
 
         void pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt);
         void createLogicalDevice();

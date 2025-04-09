@@ -82,9 +82,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         throw std::runtime_error("No suitable GPUs\n");
     }
 
-    void Device::createLogicalDevice(std::vector<char*> reqExt) {
+    void Device::createLogicalDevice(std::vector<char*> reqExt, VkPhysicalDeviceFeatures* deviceFeatures) {
         uint32_t index;
-        findQueueFamilies(this->physicalDevice, &index);
+        findQueueFamilies(physicalDevice, &index);
 
         VkDeviceCreateInfo deviceCreateInfo{};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -99,15 +99,14 @@ namespace tuga4d::Engine::Renderer::Backend {
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.queueCreateInfoCount = 1;
 
-        VkPhysicalDeviceFeatures deviceFeatures{};
-
-
+        deviceCreateInfo.enabledExtensionCount = reqExt.size();
+        deviceCreateInfo.ppEnabledExtensionNames = reqExt.data();
+        deviceCreateInfo.pEnabledFeatures = deviceFeatures;
 
         vkCreateDevice(physicalDevice, &deviceCreateInfo, NULL, &device);
 
         volkLoadDevice(device);
 
-
-
+        vkGetDeviceQueue(device, index, 0, &graphicsQueue);
     }
 }
