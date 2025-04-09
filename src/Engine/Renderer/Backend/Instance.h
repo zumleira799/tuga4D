@@ -19,9 +19,11 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
     private:
         void CreateInstance(const std::string& appName);
+        void CreateDebugMessenger();
 
         int vEngineMajor, vEngineMinor, vEnginePatch;
 
-        VkInstance instance;
+        VkInstance instance = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
     };
 }

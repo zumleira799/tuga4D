@@ -22,13 +22,13 @@ namespace tuga4d::Engine::Renderer::Backend {
         free(queueFamProp);
         return false;
     }
-    static bool checkDeviceExtensionSupport(VkPhysicalDevice physD, std::vector<char*> checkExt, int chSize) {
+    static bool checkDeviceExtensionSupport(VkPhysicalDevice physD, const std::vector<char*>& checkExt) {
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(physD, NULL, &extensionCount, NULL);
         VkExtensionProperties* dExtProp = (VkExtensionProperties*)malloc(extensionCount * sizeof(VkExtensionProperties));
         vkEnumerateDeviceExtensionProperties(physD, NULL, &extensionCount, dExtProp);
 
-        for (int i = 0; i < chSize; i++) {
+        for (int i = 0; i < checkExt.size(); i++) {
             for (int k = 0; k < extensionCount; k++) {
                 if (strcmp(checkExt[i], dExtProp[k].extensionName)) {
                     goto found;
@@ -43,18 +43,18 @@ namespace tuga4d::Engine::Renderer::Backend {
         return true;
     }
 
-    static bool isDeviceSuitable(VkPhysicalDevice dev1, std::vector<char*> reqExt) {
+    static bool isDeviceSuitable(VkPhysicalDevice dev1, const std::vector<char*>&reqExt) {
         uint32_t index;
         bool fnd = findQueueFamilies(dev1, &index);
-        bool iS = checkDeviceExtensionSupport(dev1, reqExt.data(), reqExt.size());
+        bool iS = checkDeviceExtensionSupport(dev1, reqExt);
         //figure out what to do with querying for swapchain support later
         return fnd && iS;
     }
 
     Device::Device(Instance& instance) : cInstance(instance) {
 
-        pickPhysicalDevice(instance.GetInstance(), /*required extensions*/{});
-        createLogicalDevice();
+        pickPhysicalDevice(instance.GetInstance(), /*required extensions*/);
+        createLogicalDevice(/*required extensions*/);
         Logger::Trace("Created device %s", GetDeviceName());
     }
 
@@ -63,7 +63,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
 
-    void Device::pickPhysicalDevice(VkInstance inst, std::vector<char*> reqExt) {
+    void Device::pickPhysicalDevice(VkInstance inst, const std::vector<char*>&reqExt) {
         uint32_t deviceCount;
         vkEnumeratePhysicalDevices(inst, &deviceCount, NULL);
         if (deviceCount == 0) {
@@ -82,7 +82,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         throw std::runtime_error("No suitable GPUs\n");
     }
 
-    void Device::createLogicalDevice(std::vector<char*> reqExt) {
+    void Device::createLogicalDevice(const std::vector<char*>&reqExt) {
         uint32_t index;
         findQueueFamilies(this->physicalDevice, &index);
 
