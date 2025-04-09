@@ -36,7 +36,7 @@ namespace tuga4d::Engine::Renderer::Backend {
             return memoryAllocator;
         }
         const char* GetDeviceName() {
-            return "FIXME";
+            return deviceProperties.deviceName;
         }
     private:
         Instance& cInstance;
@@ -44,6 +44,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkDevice device;
         VmaAllocator memoryAllocator = nullptr;
         VkPhysicalDeviceFeatures deviceFeatures{};
+        VkPhysicalDeviceProperties deviceProperties{};
         VkQueue graphicsQueue;
 
         void pickPhysicalDevice(VkInstance inst, const std::vector<char*>& reqExt);

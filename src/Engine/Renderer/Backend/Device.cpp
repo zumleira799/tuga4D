@@ -60,6 +60,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     Device::~Device() {
+        Logger::Trace("Destroying device %s", GetDeviceName());
         vkDestroyDevice(device, VK_NULL_HANDLE);
     }
     void Device::DestroyObject(DeviceObject* object) {
@@ -120,6 +121,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         for (int i = 0; i < deviceCount; i++) {
             if (isDeviceSuitable(phsDevices[i], reqExt)) {
                 this->physicalDevice = phsDevices[i];
+                vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+                vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
                 free(phsDevices);
                 return;
             }

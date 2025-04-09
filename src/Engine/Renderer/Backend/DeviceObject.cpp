@@ -10,7 +10,7 @@ namespace tuga4d::Engine::Renderer::Backend{
     }
 
     DeviceObject::~DeviceObject() {
-
+        Logger::Trace("Destroying object %s", GetDebugName());
     }
     void DeviceObject::CreateDebugInfo(const std::string& debugName,
         uint64_t object, VkDebugReportObjectTypeEXT objectType) {

@@ -34,8 +34,6 @@ namespace tuga4d::Engine::Renderer {
     bool Window::isWindowClosed(){
         return glfwWindowShouldClose(window);
     }
-    VkExtent2D GetExtent() {
-    }
 
     void Window::CreateWindow(const std::string& windowName, int width, int height) {
         window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);

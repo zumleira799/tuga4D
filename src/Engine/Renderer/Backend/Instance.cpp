@@ -52,7 +52,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 		const VkAllocationCallbacks* pAllocator,
 		VkDebugUtilsMessengerEXT* pDebugMessenger) {
 		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-		if (vkGetInstanceProcAddr != nullptr) {
+		if (func != nullptr) {
 			return vkCreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator, pDebugMessenger);
 		} else {
 			return VK_ERROR_EXTENSION_NOT_PRESENT;
@@ -82,6 +82,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     Instance::~Instance(){
+		Logger::Trace("Destroying vulkan instance");
 		if (ENABLE_DEBUG_VALIDATION) {
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 		}
