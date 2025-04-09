@@ -33,6 +33,7 @@ add_subdirectory("vendor/volk")
 target_include_directories("tuga4d"  
   PRIVATE ${CMAKE_SOURCE_DIR}/src
   PUBLIC ${VULKAN_SDK}/Include
+  PUBLIC vendor/volk
 )
 
 if (WIN32)
