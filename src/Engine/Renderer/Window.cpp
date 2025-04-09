@@ -28,6 +28,11 @@ namespace tuga4d::Engine::Renderer {
     Window::~Window() {
         Logger::Trace("Destroying window %p", this);
         vkDestroySurfaceKHR(instance.GetInstance(), surface, nullptr);
+        glfwDestroyWindow(window);
+    }
+
+    bool Window::isWindowClosed(){
+        return glfwWindowShouldClose(window);
     }
 
     void Window::CreateWindow(const std::string& windowName, int width, int height) {

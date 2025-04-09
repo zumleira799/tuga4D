@@ -15,6 +15,8 @@ namespace tuga4d::Engine::Renderer {
             int width = 800, int height = 600, bool resizable = false);
         ~Window();
 
+        bool isWindowClosed();
+
         VkSurfaceKHR GetSurface() {
             return surface;
         }
