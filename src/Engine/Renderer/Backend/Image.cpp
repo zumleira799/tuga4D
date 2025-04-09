@@ -41,7 +41,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         return new Image(device, debugName, createInfo);
     }
     Image::Image(Device& device, const std::string& debugName, const VkImageCreateInfo& createInfo)
-        : device(device), createInfo(createInfo) {
+        : DeviceObject(device), createInfo(createInfo) {
 
         // TODO, come back to this to implement the rest of the struct
         VmaAllocationCreateInfo allocInfo{};
@@ -52,9 +52,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         if (result != VK_SUCCESS) {
             Logger::Error("Failed to create image %s %p", GetDebugName(), this);
         }
-        CreateDebugInfo(device, debugName, (uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT);
+        CreateDebugInfo(debugName, (uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT);
     }
-    void Image::OnDestruct() {
+    Image::~Image() {
         vmaFreeMemory(device.GetMemoryAllocator(), memory);
         vkDestroyImage(device.GetDevice(), image, nullptr);
     }

@@ -5,10 +5,14 @@
 #include <typeinfo>
 
 namespace tuga4d::Engine::Renderer::Backend{
-    DeviceObject::~DeviceObject() {
-       // device.DestroyLater(this);
+    DeviceObject::DeviceObject(Device& device) : device(device) {
+
     }
-    void DeviceObject::CreateDebugInfo(Device& device, const std::string& debugName,
+
+    DeviceObject::~DeviceObject() {
+
+    }
+    void DeviceObject::CreateDebugInfo(const std::string& debugName,
         uint64_t object, VkDebugReportObjectTypeEXT objectType) {
         this->debugName = debugName;
         if (!ENABLE_DEBUG_VALIDATION) return;

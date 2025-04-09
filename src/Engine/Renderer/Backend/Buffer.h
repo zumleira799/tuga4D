@@ -145,7 +145,7 @@ namespace tuga4d::Engine::Renderer::Backend {
             return instanceCount;
         }
     protected:
-        void OnDestruct();
+        ~Buffer();
     private:
         void* mappedMemory = nullptr;
         VkDeviceSize bufferSize;
@@ -156,7 +156,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkBufferUsageFlags bufferUsage;
         VmaMemoryUsage memoryUsage;
 
-        Device& device;
         VkBuffer buffer;
         VmaAllocation memory;
     };

@@ -16,7 +16,7 @@ namespace tuga4d::Engine::Renderer {
         Logger::Trace("Initalised GLFW");
     }
     Window::Window(Instance& instance, const std::string& windowName, int width, int height, bool resizable) 
-    : instance(instance) {
+    : instance(instance), width(width), height(height) {
         Logger::Trace("Creating window %p %s %i x %i", this, windowName.c_str(), width, height);
 
         glfwWindowHint(GLFW_RESIZABLE, resizable);
@@ -33,6 +33,8 @@ namespace tuga4d::Engine::Renderer {
 
     bool Window::isWindowClosed(){
         return glfwWindowShouldClose(window);
+    }
+    VkExtent2D GetExtent() {
     }
 
     void Window::CreateWindow(const std::string& windowName, int width, int height) {

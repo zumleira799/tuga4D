@@ -1,4 +1,5 @@
 #include "Device.h"
+#include "./DeviceObject.h"
 #include "./Instance.h"
 #include <Core/Logger.h>
 #include <stdexcept>
@@ -61,7 +62,52 @@ namespace tuga4d::Engine::Renderer::Backend {
     Device::~Device() {
         vkDestroyDevice(device, VK_NULL_HANDLE);
     }
+    void Device::DestroyObject(DeviceObject* object) {
+        // Here you should queue this to be destroyed layer when it's safe
+        delete object;
+    }
+    VkFormat Device::FindSupportedImageFormat(const std::vector<VkFormat>& candidates, VkFormatFeatureFlags features) {
+        for (VkFormat format : candidates) {
+            VkFormatProperties props;
+            vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+            if ((props.optimalTilingFeatures & features) == features) {
+                return format;
+            }
+        }
+        throw std::runtime_error("failed to find supported image format!");
+    }
+    VkFormat Device::FindSupportedBufferFormat(const std::vector<VkFormat>& candidates, VkFormatFeatureFlags features) {
+        for (VkFormat format : candidates) {
+            VkFormatProperties props;
+            vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+            if ((props.bufferFeatures & features) == features) {
+                return format;
+            }
+        }
+        throw std::runtime_error("failed to find supported buffer format!");
+    }
 
+    SwapchainSupportInfo Device::GetSwapchainSupport(VkSurfaceKHR surface) {
+        SwapchainSupportInfo support{};
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &support.capabilities);
+        uint32_t formatCount;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr);
+
+        if (formatCount != 0) {
+            support.formats.resize(formatCount);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, support.formats.data());
+        }
+
+        uint32_t presentModeCount;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr);
+
+        if (presentModeCount != 0) {
+            support.presentModes.resize(presentModeCount);
+            vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, support.presentModes.data());
+        }
+
+        return support;
+    }
 
     void Device::pickPhysicalDevice(VkInstance inst, const std::vector<char*>&reqExt) {
         uint32_t deviceCount;

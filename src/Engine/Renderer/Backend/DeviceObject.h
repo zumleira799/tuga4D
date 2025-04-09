@@ -7,8 +7,8 @@ namespace tuga4d::Engine::Renderer::Backend {
     class Device;
     class DeviceObject : NoCopy, NoMove {
     public:
-        DeviceObject() = default;
-        ~DeviceObject();
+        DeviceObject(Device& device);
+
         const char* GetDebugName() {
             return debugName.empty() ? "Missing Debug Name" : debugName.c_str();
         }
@@ -16,9 +16,12 @@ namespace tuga4d::Engine::Renderer::Backend {
         // returns if the resource is valid
         virtual bool IsOk() const = 0;
     protected:
-        virtual void OnDestruct() = 0;
-        void CreateDebugInfo(Device& device, const std::string& debugName,
+        void CreateDebugInfo(const std::string& debugName,
             uint64_t object, VkDebugReportObjectTypeEXT objectType);
+
+        friend class Device; // Only device class is allowed to call the destructor
+        virtual ~DeviceObject();
+        Device& device;
     private:
         std::string debugName;
     };

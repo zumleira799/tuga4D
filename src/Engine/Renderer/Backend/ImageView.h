@@ -43,9 +43,8 @@ namespace tuga4d::Engine::Renderer::Backend {
             return createInfo.subresourceRange.baseMipLevel;
         }
     protected:
-        void OnDestruct();
+        ~ImageView();
     private:
-        Device& device;
         VkImageViewCreateInfo createInfo;
         VkImageView imageView;
     };

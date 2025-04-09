@@ -6,11 +6,25 @@
 #include <vk_mem_alloc.h>
 
 namespace tuga4d::Engine::Renderer::Backend {
+    struct SwapchainSupportInfo {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
+
     class Instance;
+    class DeviceObject;
     class Device : NoCopy, NoMove {
     public:
         Device(Instance& instance, const std::vector<char*>& reqExt);
         ~Device();
+
+        void DestroyObject(DeviceObject* object);
+
+        VkFormat FindSupportedImageFormat(const std::vector<VkFormat>& candidates, VkFormatFeatureFlags features);
+        VkFormat FindSupportedBufferFormat(const std::vector<VkFormat>& candidates, VkFormatFeatureFlags features);
+
+        SwapchainSupportInfo GetSwapchainSupport(VkSurfaceKHR surface);
 
         VkDevice GetDevice() {
             return device;

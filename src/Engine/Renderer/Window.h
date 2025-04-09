@@ -17,6 +17,13 @@ namespace tuga4d::Engine::Renderer {
 
         bool isWindowClosed();
 
+        uint32_t GetWidth() {
+            return width;
+        }
+        uint32_t GetHeight() {
+            return height;
+        }
+
         VkSurfaceKHR GetSurface() {
             return surface;
         }
@@ -31,5 +38,7 @@ namespace tuga4d::Engine::Renderer {
         VkSurfaceKHR surface;
         GLFWwindow* window;
         Backend::Instance& instance;
+
+        uint32_t width, height;
     };
 }

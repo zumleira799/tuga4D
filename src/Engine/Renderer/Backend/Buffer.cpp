@@ -38,7 +38,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         return new Buffer(device, debugName, createInfo, memoryUsage);
     }
     Buffer::Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage)
-        : device(device) {
+        : DeviceObject(device) {
         // hey vasco, it's me tristan, i actually forgot what this is for, 
         // but im pretty sure you dont ever need it to be anything other than 1
         VkDeviceSize minOffsetAlignment = 1;
@@ -55,9 +55,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         if (result != VK_SUCCESS) {
             Logger::Error("Failed to create buffer %s %p", GetDebugName(), this);
         }
-        CreateDebugInfo(device, debugName, (uint64_t)buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT);
+        CreateDebugInfo(debugName, (uint64_t)buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT);
     }
-    void Buffer::OnDestruct() {
+    Buffer::~Buffer() {
         Unmap();
         vmaFreeMemory(device.GetMemoryAllocator(), memory);
         vkDestroyBuffer(device.GetDevice(), buffer, nullptr);

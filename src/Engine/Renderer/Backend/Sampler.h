@@ -3,7 +3,7 @@
 
 namespace tuga4d::Engine::Renderer::Backend {
     // TODO
-    class Sampler : public DeviceObject {
+    class Sampler /* : public DeviceObject */{
     public:
         struct Builder {
 

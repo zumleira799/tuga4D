@@ -52,9 +52,8 @@ namespace tuga4d::Engine::Renderer::Backend {
             return createInfo.mipLevels;
         }
     protected:
-        void OnDestruct();
+        ~Image();
     private:
-        Device& device;
         VkImageCreateInfo createInfo;
         VkImage image;
         VmaAllocation memory;
