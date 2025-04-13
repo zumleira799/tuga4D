@@ -15,6 +15,14 @@ namespace tuga4d::Engine::Renderer {
 
         Logger::Trace("Initalised GLFW");
     }
+    void Window::TerminateWindowManager() {
+        Logger::Trace("Terminating GLFW");
+        glfwTerminate();
+    }
+    void Window::PollEvents() {
+        glfwPollEvents();
+    }
+
     Window::Window(Instance& instance, const std::string& windowName, int width, int height, bool resizable) 
     : instance(instance), width(width), height(height) {
         Logger::Trace("Creating window %p %s %i x %i", this, windowName.c_str(), width, height);

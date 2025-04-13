@@ -10,6 +10,8 @@ namespace tuga4d::Engine::Renderer {
     class Window : NoCopy, NoMove {
     public:
         static void InitWindowManager();
+        static void TerminateWindowManager();
+        static void PollEvents();
 
         Window(Backend::Instance& instance, const std::string& title,
             int width = 800, int height = 600, bool resizable = false);
