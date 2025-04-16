@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Renderer/Backend/Device.h>
 #include <Engine/Renderer/Backend/Instance.h>
-#include <Engine/Renderer/Window.h>
+#include <Engine/Window.h>
 
 namespace tuga4d::Application {
     class BaseApp : NoCopy, NoMove {
@@ -20,6 +20,6 @@ namespace tuga4d::Application {
         bool bIsAppOpen = true;
         Engine::Renderer::Backend::Instance* instance;
         Engine::Renderer::Backend::Device* device;
-        Engine::Renderer::Window* window;
+        Engine::Window* window;
     };
 }

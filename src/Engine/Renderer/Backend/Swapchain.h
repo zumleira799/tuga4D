@@ -2,7 +2,7 @@
 #include <Engine/Renderer/Backend/DeviceObject.h>
 
 
-namespace tuga4d::Engine::Renderer {
+namespace tuga4d::Engine {
     class Window;
 }
 namespace tuga4d::Engine::Renderer::Backend {
