@@ -9,12 +9,12 @@ namespace tuga4d::Engine::Renderer::Backend {
         windowSurface = window.GetSurface();
         windowExtent = {window.GetWidth(), window.GetHeight()};
     }
-    Swapchain::Builder& Swapchain::Builder::SetPresentMode(VkPresentModeKHR presentMode) {
-        preferredPresentMode = presentMode;
+    Swapchain::Builder& Swapchain::Builder::SetVSync(bool enabled) {
+        vsync = enabled;
         return *this;
     }
     Swapchain::Builder& Swapchain::Builder::SetFormat(VkFormat swapchainFormat) {
-        preferredFomat = swapchainFormat;
+        preferredFormat = swapchainFormat;
         return *this;
     }
     Swapchain::Builder& Swapchain::Builder::SetOldSwapchain(Swapchain* swapchain) {
@@ -22,21 +22,132 @@ namespace tuga4d::Engine::Renderer::Backend {
         return *this;
     }
     Swapchain* Swapchain::Builder::Build(Device& device, const std::string& debugName) {
-        return new Swapchain(device, preferredPresentMode, preferredFomat, windowSurface, windowExtent,
+        SwapchainSupportInfo supportInfo = device.GetSwapchainSupport(windowSurface);
+		VkSurfaceFormatKHR finalFormat{};
+		for (const auto& availableFormat : supportInfo.formats) {
+			if (availableFormat.format == preferredFormat && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+				finalFormat = preferredFormat;
+			}
+		}
+        if (finalFormat.format == VK_FORMAT_UNDEFINED) {
+            Logger::Warn("Swapchain format %i is not available! Using fallback...", (int)preferredFormat);
+            finalFormat = supportInfo.formats[0];
+        }
+        VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
+        if (vsync == false) {
+			for (const auto& availablePresentMode : supportInfo.presentModes) {
+				if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+                    presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+				} else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+                    presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+				}
+			}
+		}
+        return new Swapchain(device, presentMode, preferredFomat, windowSurface, windowExtent,
             debugName, oldSwapchain);
     }
 
-    Swapchain::Swapchain(Device& device, VkPresentModeKHR preferredPresentMode, VkFormat preferredSwapchainFormat, VkSurfaceKHR windowSurface,
+    Swapchain::Swapchain(Device& device, VkPresentModeKHR preferredPresentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
         VkExtent2D windowExtent, const std::string& debugName, Swapchain* oldSwapchain)
-        : DeviceObject(device), windowExtent(windowExtent), windowSurface(windowSurface), oldSwapchain(oldSwapchain) {
+        : DeviceObject(device), surfaceFormat(surfaceFormat), windowExtent(windowExtent), windowSurface(windowSurface), oldSwapchain(oldSwapchain) {        
+        CreateSynchronization();
         CreateSwapchain();
+        CreateFramebuffers();
+        CreateRenderPass();
+        
         CreateDebugInfo(debugName, (uint64_t)swapchain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT);
     }
     Swapchain::~Swapchain() {
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+            vkDestroyFence(device.GetDevice(), &inFlightFences[i], nullptr);
+            vkDestroySemaphore(device.GetDevice(), &imageAvailableSemaphore[i], nullptr);
+            vkDestroySemaphore(device.GetDevice(), &renderFinishedSemaphore[i], nullptr);
+        }
         vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
+    }
+    
+    void Swapchain::CreateSynchronization() {
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+            {
+                VkFenceCreateInfo createInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
+                createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+                if (vkCreateFence(device.GetDevice(), &createInfo, nullptr, &inFlightFences[i]) != VK__SUCCESS) {
+                    throw std::runtime_error("Failed to create fence!");
+                }           
+            }
+            {
+                VkSemaphoreCreateInfo createInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+                if (vkCreateSemaphore(device.GetDevice(), &createInfo, nullptr, &imageAvailableSemaphore[i]) != VK_SUCCESS) {
+                    throw std::runtime_error("Failed to create semaphore!");
+                } 
+                if (vkCreateSemaphore(device.GetDevice(), &createInfo, nullptr, &renderFinishedSemaphore[i]) != VK_SUCCESS) {
+                    throw std::runtime_error("Failed to create semaphore!");
+                } 
+            }
+        }
     }
 
     void Swapchain::CreateSwapchain() {
-        // FIXME
+        SwapchainSupportInfo supportInfo = device.GetSwapchainSupport(windowSurface);
+        VkSwapchainCreateInfoKHR createInfo{VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
+        createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        createInfo.surface = windowSurface;
+        createInfo.minImageCount = MAX_FRAMES_IN_FLIGHT;
+        createInfo.imageExtent = windowExtent;
+        createInfo.imageFormat = surfaceFormat.format;
+        createInfo.imageColorSpace = surfaceFormat.colorSpace;
+        createInfo.imageArrayLayers = 1;
+        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        uint32_t queueFamilyIndex;
+        device.findQueueFamilies(device.physicalDevice, &queueFamilyIndex);
+
+        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        createInfo.queueFamilyIndexCount = 0;
+        createInfo.pQueueFamilyIndices = NULL;
+        createInfo.preTransform = supportInfo.capabilities.currentTransform;
+        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        createInfo.presentMode = presentMode;
+        createInfo.clipped = VK_TRUE;
+        //createInfo.oldSwapchain = VK_NULL_HANDLE;
+        if(oldSwapchain != nullptr){
+            createInfo.oldSwapchain = oldSwapchain;
+        }
+
+        vkCreateSwapchainKHR(device, &createInfo, NULL, &swapchain);
+		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, nullptr);
+    }
+    }
+        
+    void Swapchain::CreateImageViews() {
+        std::vector<VkImage> swapchainImages{};
+		swapchainImages.resize(imageCount);
+		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, swapchainImages.data());
+
+		for (int i = 0; i < imageCount; ++i) {
+			VkImageViewCreateInfo imageViewCreateInfo = {};
+			imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			imageViewCreateInfo.format = surfaceFormat.format;
+			VkImageSubresourceRange subresourceRange{};
+			subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			subresourceRange.baseMipLevel = 0;
+			subresourceRange.levelCount = 1;
+			subresourceRange.baseArrayLayer = 0;
+			subresourceRange.layerCount = 1;
+			imageViewCreateInfo.subresourceRange = subresourceRange;
+			imageViewCreateInfo.image = swapchainImages[i];
+			VkImageView imageView;
+			if (vkCreateImageView(seDevice.getDevice(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
+				throw std::runtime_error("Failed to create image view!");
+			}
+			swapchainImageViews.push_back(imageView);
+		}
+    }
+    void Swapchain::CreateFramebuffers() {
+
+    }
+    void Swapchain::CreateRenderPass() {
+
     }
 }

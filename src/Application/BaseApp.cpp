@@ -26,9 +26,9 @@ namespace tuga4d::Application {
     }
 
     void BaseApp::Run() {
-        EventHandler<KeyEvent> handler = [](KeyEvent& e) {
+        EventHandler<KeyEvent> handler ([](KeyEvent& e) {
             printf("%s\n", e.GetDebugInfo().c_str());
-        };
+        });
         assert(window->BindEvent(handler));
         window->BindEvent<MouseScrollEvent>([&](MouseScrollEvent& e) {
             int posx, posy;

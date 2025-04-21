@@ -9,7 +9,7 @@ namespace tuga4d::Engine::Input {
     public:
         using Functor = std::function<void(T&)>;
 
-        EventHandler(Functor&& fn) : fn(fn) {}
+        EventHandler(const Functor& fn) : fn(fn) {}
         
         EventHandler(const EventHandler&) = default;
         EventHandler& operator=(const EventHandler&) = default;

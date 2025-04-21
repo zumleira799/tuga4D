@@ -1,6 +1,7 @@
 #pragma once
 #include <Engine/Renderer/Backend/DeviceObject.h>
-
+#include <array>
+#include <vector>
 
 namespace tuga4d::Engine {
     class Window;
@@ -8,9 +9,11 @@ namespace tuga4d::Engine {
 namespace tuga4d::Engine::Renderer::Backend {
     class Swapchain : public DeviceObject {
     public:
+        constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 2; 
+
         struct Builder {
             Builder(Window& window);
-            Builder& SetPresentMode(VkPresentModeKHR presentMode);
+            Builder& SetVSync(bool enabled);
             Builder& SetFormat(VkFormat swapchainFormat);
             Builder& SetOldSwapchain(Swapchain* swapchain);
             Swapchain* Build(Device& device, const std::string& debugName);
@@ -18,19 +21,23 @@ namespace tuga4d::Engine::Renderer::Backend {
             VkSurfaceKHR windowSurface;
             VkExtent2D windowExtent;
 
-            VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_FIFO_KHR;
-            VkFormat preferredFomat = VK_FORMAT_B8G8R8A8_UNORM;
+            bool vsync = true;
+            VkFormat preferredFormat = VK_FORMAT_B8G8R8A8_UNORM;
             Swapchain* oldSwapchain = nullptr;
         };
 
-        Swapchain(Device& device, VkPresentModeKHR preferredPresentMode, VkFormat preferredSwapchainFormat, VkSurfaceKHR windowSurface,
+        Swapchain(Device& device, VkPresentModeKHR preferredPresentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
             VkExtent2D windowExtent, const std::string& debugName, Swapchain* oldSwapchain);
 
         bool IsOk() const {
             return swapchain != VK_NULL_HANDLE;
         }
     private:
+        void CreateSynchronization();
         void CreateSwapchain();
+        void CreateImageViews();
+        void CreateFramebuffers();
+        void CreateRenderPass();
     protected:
         ~Swapchain();
     private:
@@ -38,8 +45,15 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkSurfaceKHR windowSurface;
         VkExtent2D windowExtent;
         VkPresentModeKHR presentMode;
-        VkFormat swapchainFormat;
+        VkSurfaceFormatKHR surfaceFormat;
 
-        Swapchain* oldSwapchain;
+        std::array<VkFence, MAX_FRAMES_IN_FLIGHT> inFlightFences;
+        std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> imageAvailableSemaphore;
+        std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> renderFinishedSemaphore;
+        std::vector<VkImageView> swapchainImageViews{};
+
+        uint32_t imageCount;
+
+        Swapchain* oldSwapchain = nullptr;
     };
 }
