@@ -29,8 +29,8 @@ namespace tuga4d::Engine {
     }
 
     Window::Window(Instance& instance, const std::string& windowName, int width, int height, bool resizable) 
-    : instance(instance), width(width), height(height) {
-        Logger::Trace("Creating window %p %s %i x %i", this, windowName.c_str(), width, height);
+    : instance(instance), width(width), height(height), windowName(windowName) {
+        Logger::Trace("Creating window %s %i x %i", windowName.c_str(), width, height);
 
         glfwWindowHint(GLFW_RESIZABLE, resizable);
         CreateWindow(windowName, width, height);
@@ -39,13 +39,22 @@ namespace tuga4d::Engine {
     }
 
     Window::~Window() {
-        Logger::Trace("Destroying window %p", this);
+        Logger::Trace("Destroying window %s", windowName.c_str());
         vkDestroySurfaceKHR(instance.GetInstance(), surface, nullptr);
         glfwDestroyWindow(window);
     }
 
-    bool Window::isWindowClosed(){
+    bool Window::isWindowClosed() const {
         return glfwWindowShouldClose(window);
+    }
+
+    void Window::SetSize(uint32_t width, uint32_t height) {
+        glfwSetWindowSize(window, static_cast<int>(width), static_cast<int>(height));
+    }
+
+    void Window::SetTitle(const std::string& name) {
+        windowName = name;
+        glfwSetWindowTitle(window, name.c_str());
     }
 
     void Window::CreateWindow(const std::string& windowName, int width, int height) {
@@ -93,6 +102,8 @@ namespace tuga4d::Engine {
     }
     void Window::ResizeCallback(GLFWwindow* window, int width, int height) {
         Window* pThis = static_cast<Window*>(glfwGetWindowUserPointer(window));
+        pThis->width = width;
+        pThis->height = height;
         WindowResizeEvent event = WindowResizeEvent(*pThis, width, height);
         pThis->GetEventDispatcher<WindowResizeEvent>().Dispatch(event);
     }
