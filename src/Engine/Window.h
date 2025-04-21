@@ -32,20 +32,26 @@ namespace tuga4d::Engine {
         static void InitWindowManager();
         static void TerminateWindowManager();
         static void PollEvents();
-        static void WaitEvents(double timeout);
+        static void WaitEvents(double timeout = -1.0);
 
         Window(Renderer::Backend::Instance& instance, const std::string& title,
             int width = 800, int height = 600, bool resizable = false);
         ~Window();
 
-        bool isWindowClosed();
+        bool isWindowClosed() const;
 
-        uint32_t GetWidth() {
+        uint32_t GetWidth() const {
             return width;
         }
-        uint32_t GetHeight() {
+        uint32_t GetHeight() const {
             return height;
         }
+        void SetSize(uint32_t width, uint32_t height);
+
+        std::string GetTitle() const {
+            return windowName;
+        }
+        void SetTitle(const std::string& name);
 
         VkSurfaceKHR GetSurface() {
             return surface;
@@ -99,6 +105,7 @@ namespace tuga4d::Engine {
         GLFWwindow* window;
         Renderer::Backend::Instance& instance;
 
+        std::string windowName;
         uint32_t width, height;
     };
 }
