@@ -110,6 +110,15 @@ namespace tuga4d::Engine::Renderer::Backend {
         return support;
     }
 
+    CommandPool* Device::RequestCommandPool() {
+        return nullptr;
+    }
+
+    void Device::ReleaseCommandPool(CommandPool* commandPool) {
+        assert(commandPool != nullptr);
+
+    }
+
     void Device::pickPhysicalDevice(VkInstance inst, const std::vector<char*>&reqExt) {
         uint32_t deviceCount;
         vkEnumeratePhysicalDevices(inst, &deviceCount, NULL);

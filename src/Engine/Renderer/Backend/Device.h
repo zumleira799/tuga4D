@@ -13,6 +13,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     };
 
     class Instance;
+    class CommandPool;
     class DeviceObject;
     class Device : NoCopy, NoMove {
     public:
@@ -26,6 +27,9 @@ namespace tuga4d::Engine::Renderer::Backend {
 
         SwapchainSupportInfo GetSwapchainSupport(VkSurfaceKHR surface);
 
+        CommandPool* RequestCommandPool();
+        void ReleaseCommandPool(CommandPool* commandPool);
+
         VkDevice GetDevice() {
             return device;
         }
@@ -35,8 +39,11 @@ namespace tuga4d::Engine::Renderer::Backend {
         VmaAllocator GetMemoryAllocator() {
             return memoryAllocator;
         }
-        const char* GetDeviceName() {
+        const char* GetDeviceName() const {
             return deviceProperties.deviceName;
+        }
+        const VkPhysicalDeviceProperties& GetDeviceProperties() const {
+            return deviceProperties;
         }
     private:
         Instance& cInstance;
@@ -46,6 +53,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDeviceFeatures deviceFeatures{};
         VkPhysicalDeviceProperties deviceProperties{};
         VkQueue graphicsQueue;
+
+        CommandPool* commandPoolList = nullptr;
 
         void pickPhysicalDevice(VkInstance inst, const std::vector<char*>& reqExt);
         void createLogicalDevice(const std::vector<char*>& reqExt);
