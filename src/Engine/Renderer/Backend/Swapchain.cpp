@@ -117,7 +117,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         vkCreateSwapchainKHR(device, &createInfo, NULL, &swapchain);
 		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, nullptr);
     }
-    }
         
     void Swapchain::CreateImageViews() {
         std::vector<VkImage> swapchainImages{};
@@ -138,7 +137,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 			imageViewCreateInfo.subresourceRange = subresourceRange;
 			imageViewCreateInfo.image = swapchainImages[i];
 			VkImageView imageView;
-			if (vkCreateImageView(seDevice.getDevice(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
+			if (vkCreateImageView(device.GetDevice(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
 				throw std::runtime_error("Failed to create image view!");
 			}
 			swapchainImageViews.push_back(imageView);
@@ -148,6 +147,6 @@ namespace tuga4d::Engine::Renderer::Backend {
 
     }
     void Swapchain::CreateRenderPass() {
-
+        // TODO: vasco vai atualisar a tua batata chamado de Dell
     }
 }
