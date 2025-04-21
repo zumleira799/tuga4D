@@ -16,11 +16,11 @@ namespace tuga4d::Engine::Input {
             return "MouseButtonEvent";
         }
         virtual std::string GetDebugInfo()  const override {
-            return "Mouse Button : " + std::to_string((int)Button) + " " + (IsDown ? "Down" : "Up");
+            return "Mouse Button : " + std::to_string((int)button) + " " + (isDown ? "Down" : "Up");
         }
 
-        const MouseButton Button;
-        const Modifiers::Flags Modifiers;
-        const bool IsDown;
+        const MouseButton button;
+        const Modifiers::Flags modifiers;
+        const bool isDown;
     };
 }

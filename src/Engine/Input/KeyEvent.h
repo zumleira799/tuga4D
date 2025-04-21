@@ -16,13 +16,13 @@ namespace tuga4d::Engine::Input {
             return "KeyEvent";
         }
         virtual std::string GetDebugInfo()  const override {
-            return "Key : " + std::to_string((int)Key) + " " + 
-                (IsDown ? (IsRepeating ? "Repeating" : "Down") : "Up");
+            return "Key : " + std::to_string((int)key) + " " + 
+                (isDown ? (isRepeating ? "Repeating" : "Down") : "Up");
         }
 
-        const Key Key;
-        const Modifiers::Flags Modifiers;
-        const bool IsDown;
-        const bool IsRepeating;
+        const Key key;
+        const Modifiers::Flags modifiers;
+        const bool isDown;
+        const bool isRepeating;
     };
 }

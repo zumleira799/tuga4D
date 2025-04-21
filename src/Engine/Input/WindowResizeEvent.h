@@ -14,10 +14,10 @@ namespace tuga4d::Engine::Input {
             return "CharInputEvent";
         }
         virtual std::string GetDebugInfo()  const override {
-            return "Window Resize: (" + std::to_string(Width) + ", " + std::to_string(Height) + ")";
+            return "Window Resize: (" + std::to_string(width) + ", " + std::to_string(height) + ")";
         }
 
-        const int Width;
-        const int Height;
+        const int width;
+        const int height;
     };
 }

@@ -20,6 +20,6 @@ namespace tuga4d::Engine::Input {
             return "Char Typed: " + (char)Unicode;
         }
 
-        const UnicodeCharacter Unicode;
+        const UnicodeCharacter unicode;
     };
 }

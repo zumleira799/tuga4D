@@ -14,10 +14,10 @@ namespace tuga4d::Engine::Input {
             return "MouseScrollEvent";
         }
         virtual std::string GetDebugInfo()  const override {
-            return "Mouse Scroll : (" + std::to_string(Horizontal) + ", " + std::to_string(Vertical) + ")";
+            return "Mouse Scroll : (" + std::to_string(horizontal) + ", " + std::to_string(vertical) + ")";
         }
 
-        const float Horizontal;
-        const float Vertical;
+        const float horizontal;
+        const float vertical;
     };
 }

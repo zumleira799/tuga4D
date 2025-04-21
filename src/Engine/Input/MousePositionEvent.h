@@ -14,10 +14,10 @@ namespace tuga4d::Engine::Input {
             return "MousePositionEvent";
         }
         virtual std::string GetDebugInfo()  const override {
-            return "Mouse Position : (" + std::to_string(PosX) + ", " + std::to_string(PosY) + ")";
+            return "Mouse Position : (" + std::to_string(posX) + ", " + std::to_string(posY) + ")";
         }
 
-        const float PosX;
-        const float PosY;
+        const float posX;
+        const float posY;
     };
 }
