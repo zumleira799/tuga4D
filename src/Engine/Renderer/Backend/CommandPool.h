@@ -11,7 +11,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
 
         bool IsOk() const {
-            return commandBuffer != VK_NULL_HANDLE;
+            return commandPool != VK_NULL_HANDLE;
         }
     protected:
         virtual ~CommandPool();

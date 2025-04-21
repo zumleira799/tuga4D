@@ -33,7 +33,7 @@ namespace tuga4d::Application {
         window->BindEvent<MouseScrollEvent>([&](MouseScrollEvent& e) {
             int posx, posy;
             glfwGetWindowPos(window->GetWindow(), &posx, &posy);
-            glfwSetWindowPos(window->GetWindow(), posx + e.Horizontal, posy + e.Vertical);
+            glfwSetWindowPos(window->GetWindow(), posx + e.horizontal, posy + e.vertical);
         });
 
         auto timeStampPreviousFrame = std::chrono::high_resolution_clock::now();

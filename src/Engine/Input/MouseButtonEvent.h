@@ -7,7 +7,7 @@ namespace tuga4d::Engine::Input {
     class MouseButtonEvent : public Event<EventType::MouseButton> {
     public:
         MouseButtonEvent(Window& sender, MouseButton btn, Modifiers::Flags mods, bool isDown)
-            : Event(sender), Button(btn), Modifiers(mods), IsDown(isDown) {}
+            : Event(sender), button(btn), modifiers(mods), isDown(isDown) {}
 
         virtual EventType GetType() const override {
             return EventType::MouseButton;

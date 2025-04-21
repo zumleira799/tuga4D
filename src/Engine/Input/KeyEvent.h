@@ -7,7 +7,7 @@ namespace tuga4d::Engine::Input {
     class KeyEvent : public Event<EventType::Key> {
     public:
         KeyEvent(Window& sender, Key key, Modifiers::Flags mods, bool isDown, bool repeat)
-            : Event(sender), Key(key), Modifiers(mods), IsDown(isDown), IsRepeating(repeat) {}
+            : Event(sender), key(key), modifiers(mods), isDown(isDown), isRepeating(repeat) {}
 
         virtual EventType GetType() const override {
             return EventType::Key;

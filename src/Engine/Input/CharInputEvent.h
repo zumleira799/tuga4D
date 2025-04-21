@@ -7,7 +7,7 @@ namespace tuga4d::Engine::Input {
     public:
         using UnicodeCharacter = int;
         CharInputEvent(Window& sender, int unicode)
-        : Event(sender), Unicode(unicode) {}
+        : Event(sender), unicode(unicode) {}
 
         virtual EventType GetType() const override {
             return EventType::CharInput;
@@ -17,7 +17,7 @@ namespace tuga4d::Engine::Input {
         }
         virtual std::string GetDebugInfo()  const override {
             // TODO: Support for not just ASCII characters
-            return "Char Typed: " + (char)Unicode;
+            return "Char Typed: " + (char)unicode;
         }
 
         const UnicodeCharacter unicode;

@@ -5,7 +5,7 @@ namespace tuga4d::Engine::Input {
     class MousePositionEvent : public Event<EventType::MousePosition> {
     public:
         MousePositionEvent(Window& sender, float x, float y)
-            : Event(sender), PosX(x), PosY(y) {}
+            : Event(sender), posX(x), posY(y) {}
 
         virtual EventType GetType() const override {
             return EventType::MousePosition;

@@ -5,7 +5,7 @@ namespace tuga4d::Engine::Input {
     class MouseScrollEvent : public Event<EventType::MouseScroll> {
     public:
         MouseScrollEvent(Window& sender, float x, float y)
-            : Event(sender), Horizontal(x), Vertical(y) {}
+            : Event(sender), horizontal(x), vertical(y) {}
 
         virtual EventType GetType() const override {
             return EventType::MouseScroll;

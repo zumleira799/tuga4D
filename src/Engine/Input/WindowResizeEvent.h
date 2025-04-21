@@ -5,7 +5,7 @@ namespace tuga4d::Engine::Input {
     class WindowResizeEvent : public Event<EventType::WindowResize> {
     public:
         WindowResizeEvent(Window& sender, int width, int height)
-            : Event(sender), Width(width), Height(height) {}
+            : Event(sender), width(width), height(height) {}
 
         virtual EventType GetType() const override {
             return EventType::CharInput;
