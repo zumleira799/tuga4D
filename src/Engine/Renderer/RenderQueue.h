@@ -19,7 +19,6 @@ namespace tuga4d::Engine::Renderer {
         uint32_t GetFrameIndex() {
             return frameIndex;
         }
-
     private:
         void CreateSynchronization();
     private:
@@ -27,7 +26,6 @@ namespace tuga4d::Engine::Renderer {
         std::vector<VkSwapchainKHR> submittedSwapchains{};
         std::vector<VkSemaphore> awaitImageAvailableSemaphores{};
         std::vector<uint32_t> imageIndices{};
-
 
         std::array<bool, Backend::MAX_FRAMES_IN_FLIGHT> inFlightFencesFirstSignal;
         std::array<VkFence, Backend::MAX_FRAMES_IN_FLIGHT> inFlightFences;

@@ -39,6 +39,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkQueue GetQueue() {
             return graphicsQueue;
         }
+        uint32_t GetQueueFamilyIndex() {
+            return graphicsQueueFamilyIndex;
+        }
         VmaAllocator GetMemoryAllocator() {
             return memoryAllocator;
         }
@@ -48,6 +51,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         const VkPhysicalDeviceProperties& GetDeviceProperties() const {
             return deviceProperties;
         }
+
     private:
         Instance& cInstance;
         VkPhysicalDevice physicalDevice;
@@ -56,6 +60,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDeviceFeatures deviceFeatures{};
         VkPhysicalDeviceProperties deviceProperties{};
         VkQueue graphicsQueue;
+        uint32_t graphicsQueueFamilyIndex;
 
         CommandPool* commandPoolList = nullptr;
 

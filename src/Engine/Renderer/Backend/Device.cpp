@@ -69,6 +69,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
     void Device::DestroyObject(DeviceObject* object) {
         // Here you should queue this to be destroyed layer when it's safe
+        vkDeviceWaitIdle(device); // todo: remove
         delete object;
     }
     VkFormat Device::FindSupportedImageFormat(const std::vector<VkFormat>& candidates, VkFormatFeatureFlags features) {
@@ -110,7 +111,6 @@ namespace tuga4d::Engine::Renderer::Backend {
             support.presentModes.resize(presentModeCount);
             vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, support.presentModes.data());
         }
-
         return support;
     }
 
@@ -152,15 +152,13 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     void Device::createLogicalDevice(const std::vector<char*>&reqExt) {
-        uint32_t index;
-        findQueueFamilies(physicalDevice, &index);
-
+        findQueueFamilies(physicalDevice, &graphicsQueueFamilyIndex);
         VkDeviceCreateInfo deviceCreateInfo{};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = index;
+        queueCreateInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
         queueCreateInfo.queueCount = 1;
         float queuePriority = 1.0f;
         queueCreateInfo.pQueuePriorities = &queuePriority;
@@ -176,6 +174,6 @@ namespace tuga4d::Engine::Renderer::Backend {
 
         volkLoadDevice(device);
 
-        vkGetDeviceQueue(device, index, 0, &graphicsQueue);
+        vkGetDeviceQueue(device, graphicsQueueFamilyIndex, 0, &graphicsQueue);
     }
 }
