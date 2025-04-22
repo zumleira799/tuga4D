@@ -57,6 +57,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         pickPhysicalDevice(instance.GetInstance(), reqExt);
         createLogicalDevice(reqExt);
         Logger::Trace("Created device %s", GetDeviceName());
+        Logger::Trace("Using extensions: ");
+        for (char* str : reqExt) {
+            printf("\t%s\n", str);
+        }
     }
 
     Device::~Device() {

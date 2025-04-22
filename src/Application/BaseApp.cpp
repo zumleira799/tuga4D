@@ -13,7 +13,7 @@ namespace tuga4d::Application {
         Window::InitWindowManager();
 
         instance = new Instance(1, 0, 0, "Minha applicacao tuga");
-        device = new Device(*instance, { VK_KHR_SWAPCHAIN_EXTENSION_NAME });
+        device = new Device(*instance, { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME });
         window = new Window(*instance, "grote ballen");
     }
 

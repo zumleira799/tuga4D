@@ -92,7 +92,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     void Instance::CreateInstance(const std::string& appName) {
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = VK_API_VERSION_1_3;
 
         appInfo.applicationVersion = VK_MAKE_VERSION(vEngineMajor, vEngineMinor, vEnginePatch);
         appInfo.engineVersion = VK_MAKE_VERSION(vEngineMajor, vEngineMinor, vEnginePatch);
