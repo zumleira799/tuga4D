@@ -15,6 +15,6 @@ namespace tuga4d::Engine::Renderer::Backend {
     protected:
         void OnDestruct();
     private:
-        VkSampler sampler;
+        VkSampler sampler = VK_NULL_HANDLE;
     };
 }

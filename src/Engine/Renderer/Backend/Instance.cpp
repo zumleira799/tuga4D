@@ -19,6 +19,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 		if (ENABLE_DEBUG_VALIDATION) {
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
+		extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 
 		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 #ifdef _WIN32

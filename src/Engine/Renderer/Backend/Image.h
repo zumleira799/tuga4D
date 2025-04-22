@@ -55,7 +55,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         ~Image();
     private:
         VkImageCreateInfo createInfo;
-        VkImage image;
+        VkImage image = VK_NULL_HANDLE;
         VmaAllocation memory;
     };
 }

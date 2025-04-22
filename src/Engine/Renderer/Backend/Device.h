@@ -36,6 +36,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDevice GetPhysicalDevice() {
             return physicalDevice;
         }
+        VkQueue GetQueue() {
+            return graphicsQueue;
+        }
         VmaAllocator GetMemoryAllocator() {
             return memoryAllocator;
         }

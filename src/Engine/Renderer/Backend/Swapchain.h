@@ -25,33 +25,50 @@ namespace tuga4d::Engine::Renderer::Backend {
             Swapchain* oldSwapchain = nullptr;
         };
 
-        Swapchain(Device& device, VkPresentModeKHR preferredPresentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
+        Swapchain(Device& device, VkPresentModeKHR presentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
             VkExtent2D windowExtent, const std::string& debugName, Swapchain* oldSwapchain);
+
+        VkResult AcquireNextImage();
+
+        void BeginRendering();
+        void EndRendering();
 
         bool IsOk() const {
             return swapchain != VK_NULL_HANDLE;
         }
+
+        VkSwapchainKHR GetSwapchain() {
+            return swapchain;
+        }
+        VkSemaphore GetCurrentWaitSemaphore() {
+            return imageAvailableSemaphore[imageIndex];
+        }
+        VkExtent2D GetExtent() {
+            return windowExtent;
+        }
+        uint32_t GetImageIndex() {
+            return imageIndex;
+        }
     private:
-        void CreateSynchronization();
+        void CreateSemaphores();
         void CreateSwapchain();
         void CreateImageViews();
         void CreateRenderPass();
     protected:
         ~Swapchain();
     private:
-        VkSwapchainKHR swapchain;
+        VkSwapchainKHR swapchain = VK_NULL_HANDLE;
         VkSurfaceKHR windowSurface;
         VkExtent2D windowExtent;
         VkPresentModeKHR presentMode;
         VkSurfaceFormatKHR surfaceFormat;
 
-        std::array<VkFence, MAX_FRAMES_IN_FLIGHT> inFlightFences;
-        std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> imageAvailableSemaphore;
-        std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> renderFinishedSemaphore;
         std::vector<VkImageView> swapchainImageViews{};
         std::vector<VkRenderingAttachmentInfo> swapchainAttachments{};
+        std::vector<VkSemaphore> imageAvailableSemaphore{};
 
-        uint32_t imageCount;
+        uint32_t imageIndex = 0;
+        uint32_t imageCount = 0;
         Swapchain* oldSwapchain = nullptr;
     };
 }

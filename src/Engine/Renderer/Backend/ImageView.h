@@ -46,6 +46,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         ~ImageView();
     private:
         VkImageViewCreateInfo createInfo;
-        VkImageView imageView;
+        VkImageView imageView = VK_NULL_HANDLE;
     };
 }

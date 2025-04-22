@@ -47,48 +47,50 @@ namespace tuga4d::Engine::Renderer::Backend {
             debugName, oldSwapchain);
     }
 
-    Swapchain::Swapchain(Device& device, VkPresentModeKHR preferredPresentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
+    Swapchain::Swapchain(Device& device, VkPresentModeKHR presentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
         VkExtent2D windowExtent, const std::string& debugName, Swapchain* oldSwapchain)
-        : DeviceObject(device), surfaceFormat(surfaceFormat), windowExtent(windowExtent), windowSurface(windowSurface), oldSwapchain(oldSwapchain) {        
-        CreateSynchronization();
+        : DeviceObject(device), surfaceFormat(surfaceFormat), presentMode(presentMode), windowExtent(windowExtent),
+        windowSurface(windowSurface), oldSwapchain(oldSwapchain) {        
         CreateSwapchain();
+        CreateSemaphores();
+        CreateImageViews();
         CreateRenderPass();
         
         CreateDebugInfo(debugName, (uint64_t)swapchain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT);
     }
+    VkResult Swapchain::AcquireNextImage() {
+        VkAcquireNextImageInfoKHR acquireInfo{ VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR };
+        acquireInfo.swapchain = swapchain;
+        acquireInfo.timeout = UINT64_MAX;
+        acquireInfo.semaphore = imageAvailableSemaphore[imageIndex];
+        acquireInfo.deviceMask = 0x1;
+        acquireInfo.fence = VK_NULL_HANDLE;
+        return vkAcquireNextImage2KHR(device.GetDevice(), &acquireInfo, &imageIndex);
+    }
+    void Swapchain::BeginRendering() {
+        // FIXME
+        // vkCmdBeginRendering();
+    }
+    void Swapchain::EndRendering() {
+        // FIXME
+        // vkCmdEndRendering();
+    }
     Swapchain::~Swapchain() {
-        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-            vkDestroyFence(device.GetDevice(), inFlightFences[i], nullptr);
-            vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphore[i], nullptr);
-            vkDestroySemaphore(device.GetDevice(), renderFinishedSemaphore[i], nullptr);
-        }
         for (int i = 0; i < imageCount; ++i) {
+            vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphore[i], nullptr);
             vkDestroyImageView(device.GetDevice(), swapchainImageViews[i], nullptr);
         }
         vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
     }
-    
-    void Swapchain::CreateSynchronization() {
-        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-            {
-                VkFenceCreateInfo createInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
-                createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-                if (vkCreateFence(device.GetDevice(), &createInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
-                    throw std::runtime_error("Failed to create fence!");
-                }           
-            }
-            {
-                VkSemaphoreCreateInfo createInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
-                if (vkCreateSemaphore(device.GetDevice(), &createInfo, nullptr, &imageAvailableSemaphore[i]) != VK_SUCCESS) {
-                    throw std::runtime_error("Failed to create semaphore!");
-                } 
-                if (vkCreateSemaphore(device.GetDevice(), &createInfo, nullptr, &renderFinishedSemaphore[i]) != VK_SUCCESS) {
-                    throw std::runtime_error("Failed to create semaphore!");
-                } 
+    void Swapchain::CreateSemaphores() {
+        imageAvailableSemaphore.resize(imageCount);
+        for (int i = 0; i < imageCount; ++i) {
+            VkSemaphoreCreateInfo createInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+            if (vkCreateSemaphore(device.GetDevice(), &createInfo, nullptr, &imageAvailableSemaphore[i]) != VK_SUCCESS) {
+                throw std::runtime_error("Failed to create semaphore!");
             }
         }
     }
-
     void Swapchain::CreateSwapchain() {
         SwapchainSupportInfo supportInfo = device.GetSwapchainSupport(windowSurface);
         VkSwapchainCreateInfoKHR createInfo{VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
@@ -108,7 +110,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
-        //createInfo.oldSwapchain = VK_NULL_HANDLE;
+        createInfo.oldSwapchain = VK_NULL_HANDLE;
         if(oldSwapchain != nullptr){
             createInfo.oldSwapchain = oldSwapchain->swapchain;
         }
@@ -122,6 +124,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 		swapchainImages.resize(imageCount);
 		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, swapchainImages.data());
 
+        swapchainImageViews.resize(imageCount);
 		for (int i = 0; i < imageCount; ++i) {
 			VkImageViewCreateInfo imageViewCreateInfo = {};
 			imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -135,11 +138,9 @@ namespace tuga4d::Engine::Renderer::Backend {
 			subresourceRange.layerCount = 1;
 			imageViewCreateInfo.subresourceRange = subresourceRange;
 			imageViewCreateInfo.image = swapchainImages[i];
-			VkImageView imageView;
-			if (vkCreateImageView(device.GetDevice(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
+			if (vkCreateImageView(device.GetDevice(), &imageViewCreateInfo, nullptr, &swapchainImageViews[i]) != VK_SUCCESS) {
 				throw std::runtime_error("Failed to create image view!");
 			}
-			swapchainImageViews.push_back(imageView);
 		}
     }
     void Swapchain::CreateRenderPass() {
@@ -149,7 +150,7 @@ namespace tuga4d::Engine::Renderer::Backend {
             attachmentInfo.imageView = swapchainImageViews[i];
             attachmentInfo.imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
             attachmentInfo.resolveMode = VK_RESOLVE_MODE_NONE;
-            attachmentInfo.
+            //attachmentInfo.
             swapchainAttachments.push_back(attachmentInfo);
         }
     }
