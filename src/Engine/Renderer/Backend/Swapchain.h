@@ -35,7 +35,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         void CreateSynchronization();
         void CreateSwapchain();
         void CreateImageViews();
-        void CreateFramebuffers();
         void CreateRenderPass();
     protected:
         ~Swapchain();
@@ -50,9 +49,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> imageAvailableSemaphore;
         std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> renderFinishedSemaphore;
         std::vector<VkImageView> swapchainImageViews{};
+        std::vector<VkRenderingAttachmentInfo> swapchainAttachments{};
 
         uint32_t imageCount;
-
         Swapchain* oldSwapchain = nullptr;
     };
 }

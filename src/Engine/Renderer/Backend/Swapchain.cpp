@@ -52,7 +52,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         : DeviceObject(device), surfaceFormat(surfaceFormat), windowExtent(windowExtent), windowSurface(windowSurface), oldSwapchain(oldSwapchain) {        
         CreateSynchronization();
         CreateSwapchain();
-        CreateFramebuffers();
         CreateRenderPass();
         
         CreateDebugInfo(debugName, (uint64_t)swapchain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT);
@@ -62,6 +61,9 @@ namespace tuga4d::Engine::Renderer::Backend {
             vkDestroyFence(device.GetDevice(), inFlightFences[i], nullptr);
             vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphore[i], nullptr);
             vkDestroySemaphore(device.GetDevice(), renderFinishedSemaphore[i], nullptr);
+        }
+        for (int i = 0; i < imageCount; ++i) {
+            vkDestroyImageView(device.GetDevice(), swapchainImageViews[i], nullptr);
         }
         vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
     }
@@ -140,10 +142,15 @@ namespace tuga4d::Engine::Renderer::Backend {
 			swapchainImageViews.push_back(imageView);
 		}
     }
-    void Swapchain::CreateFramebuffers() {
-
-    }
     void Swapchain::CreateRenderPass() {
-        // TODO: vasco vai atualisar a tua batata chamado de Dell
+        for (int i = 0; i < imageCount; ++i) {
+            VkRenderingAttachmentInfo attachmentInfo{VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO};
+            attachmentInfo.clearValue.color = { 0, 0, 0, 0 };
+            attachmentInfo.imageView = swapchainImageViews[i];
+            attachmentInfo.imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            attachmentInfo.resolveMode = VK_RESOLVE_MODE_NONE;
+            attachmentInfo.
+            swapchainAttachments.push_back(attachmentInfo);
+        }
     }
 }
