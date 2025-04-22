@@ -66,14 +66,16 @@ namespace tuga4d::Engine::Renderer {
             presentInfo.pImageIndices = imageIndices.data();
             presentInfo.pSwapchains = submittedSwapchains.data();
             presentInfo.swapchainCount = submittedSwapchains.size();
-            presentInfo.pWaitSemaphores = awaitImageAvailableSemaphores.data();
-            presentInfo.waitSemaphoreCount = awaitImageAvailableSemaphores.size();
+            presentInfo.pWaitSemaphores = &renderFinishedSemaphore[frameIndex];
+            presentInfo.waitSemaphoreCount = 1;
             presentInfo.pResults = result.data();
             vkQueuePresentKHR(device.GetQueue(), &presentInfo);
         }
 
         submittedCommands.clear();
         submittedSwapchains.clear();
+        awaitImageAvailableSemaphores.clear();
+        imageIndices.clear();
 
         frameIndex = (frameIndex + 1) % MAX_FRAMES_IN_FLIGHT;
     }

@@ -58,11 +58,11 @@ namespace tuga4d::Engine::Renderer::Backend {
         
         CreateDebugInfo(debugName, (uint64_t)swapchain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT);
     }
-    VkResult Swapchain::AcquireNextImage() {
+    VkResult Swapchain::AcquireNextImage(uint32_t frameIndex) {
         VkAcquireNextImageInfoKHR acquireInfo{ VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR };
         acquireInfo.swapchain = swapchain;
         acquireInfo.timeout = UINT64_MAX;
-        acquireInfo.semaphore = imageAvailableSemaphore[imageIndex];
+        acquireInfo.semaphore = imageAvailableSemaphore[frameIndex];
         acquireInfo.deviceMask = 0x1;
         acquireInfo.fence = VK_NULL_HANDLE;
         return vkAcquireNextImage2KHR(device.GetDevice(), &acquireInfo, &imageIndex);
@@ -83,8 +83,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
     }
     void Swapchain::CreateSemaphores() {
-        imageAvailableSemaphore.resize(imageCount);
-        for (int i = 0; i < imageCount; ++i) {
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
             VkSemaphoreCreateInfo createInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
             if (vkCreateSemaphore(device.GetDevice(), &createInfo, nullptr, &imageAvailableSemaphore[i]) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create semaphore!");

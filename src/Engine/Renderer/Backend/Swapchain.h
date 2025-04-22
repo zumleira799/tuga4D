@@ -28,7 +28,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         Swapchain(Device& device, VkPresentModeKHR presentMode, VkSurfaceFormatKHR surfaceFormat, VkSurfaceKHR windowSurface,
             VkExtent2D windowExtent, const std::string& debugName, Swapchain* oldSwapchain);
 
-        VkResult AcquireNextImage();
+        VkResult AcquireNextImage(uint32_t frameIndex);
 
         void BeginRendering();
         void EndRendering();
@@ -65,7 +65,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 
         std::vector<VkImageView> swapchainImageViews{};
         std::vector<VkRenderingAttachmentInfo> swapchainAttachments{};
-        std::vector<VkSemaphore> imageAvailableSemaphore{};
+        std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> imageAvailableSemaphore{};
 
         uint32_t imageIndex = 0;
         uint32_t imageCount = 0;

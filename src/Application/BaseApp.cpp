@@ -55,13 +55,13 @@ namespace tuga4d::Application {
             OnFrame(deltaTime);
 
             renderQueue->WaitFences();
-            if (VkResult acquireResult = swapchain->AcquireNextImage(); acquireResult == VK_SUCCESS) {
+            if (VkResult acquireResult = swapchain->AcquireNextImage(renderQueue->GetFrameIndex()); acquireResult == VK_SUCCESS) {
                 //renderQueue->SubmitCommand();
                 renderQueue->PresentSwapchain(swapchain);
-                renderQueue->Flush();
             } else {
                 // resize logic
             }
+            renderQueue->Flush();
         }
     }
 }
