@@ -139,9 +139,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         for (int i = 0; i < deviceCount; i++) {
             vkGetPhysicalDeviceFeatures(phsDevices[i], &deviceFeatures);
             vkGetPhysicalDeviceProperties(phsDevices[i], &deviceProperties);
-            bool validGPU = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ||
-                deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
-            if (isDeviceSuitable(phsDevices[i], reqExt) && validGPU) {
+            //bool validGPU = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ||
+            //    deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+            if (isDeviceSuitable(phsDevices[i], reqExt) /* && validGPU*/) {
                 this->physicalDevice = phsDevices[i];
                 free(phsDevices);
                 return;
