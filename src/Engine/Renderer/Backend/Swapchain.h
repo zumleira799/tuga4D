@@ -7,10 +7,9 @@ namespace tuga4d::Engine {
     class Window;
 }
 namespace tuga4d::Engine::Renderer::Backend {
+    constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 2;
     class Swapchain : public DeviceObject {
     public:
-        constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 2; 
-
         struct Builder {
             Builder(Window& window);
             Builder& SetVSync(bool enabled);

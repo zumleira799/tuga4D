@@ -26,11 +26,11 @@ namespace tuga4d::Engine::Renderer::Backend {
 		VkSurfaceFormatKHR finalFormat{};
 		for (const auto& availableFormat : supportInfo.formats) {
 			if (availableFormat.format == preferredFormat && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-				finalFormat = preferredFormat;
+				finalFormat = availableFormat;
 			}
 		}
         if (finalFormat.format == VK_FORMAT_UNDEFINED) {
-            Logger::Warn("Swapchain format %i is not available! Using fallback...", (int)preferredFormat);
+            Logger::Warning("Swapchain format %i is not available! Using fallback...", (int)preferredFormat);
             finalFormat = supportInfo.formats[0];
         }
         VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
@@ -43,7 +43,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 				}
 			}
 		}
-        return new Swapchain(device, presentMode, preferredFomat, windowSurface, windowExtent,
+        return new Swapchain(device, presentMode, finalFormat, windowSurface, windowExtent,
             debugName, oldSwapchain);
     }
 
@@ -59,9 +59,9 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
     Swapchain::~Swapchain() {
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-            vkDestroyFence(device.GetDevice(), &inFlightFences[i], nullptr);
-            vkDestroySemaphore(device.GetDevice(), &imageAvailableSemaphore[i], nullptr);
-            vkDestroySemaphore(device.GetDevice(), &renderFinishedSemaphore[i], nullptr);
+            vkDestroyFence(device.GetDevice(), inFlightFences[i], nullptr);
+            vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphore[i], nullptr);
+            vkDestroySemaphore(device.GetDevice(), renderFinishedSemaphore[i], nullptr);
         }
         vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
     }
@@ -71,7 +71,7 @@ namespace tuga4d::Engine::Renderer::Backend {
             {
                 VkFenceCreateInfo createInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
                 createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-                if (vkCreateFence(device.GetDevice(), &createInfo, nullptr, &inFlightFences[i]) != VK__SUCCESS) {
+                if (vkCreateFence(device.GetDevice(), &createInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
                     throw std::runtime_error("Failed to create fence!");
                 }           
             }
@@ -99,9 +99,6 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        uint32_t queueFamilyIndex;
-        device.findQueueFamilies(device.physicalDevice, &queueFamilyIndex);
-
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         createInfo.queueFamilyIndexCount = 0;
         createInfo.pQueueFamilyIndices = NULL;
@@ -111,10 +108,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.clipped = VK_TRUE;
         //createInfo.oldSwapchain = VK_NULL_HANDLE;
         if(oldSwapchain != nullptr){
-            createInfo.oldSwapchain = oldSwapchain;
+            createInfo.oldSwapchain = oldSwapchain->swapchain;
         }
 
-        vkCreateSwapchainKHR(device, &createInfo, NULL, &swapchain);
+        vkCreateSwapchainKHR(device.GetDevice(), &createInfo, NULL, &swapchain);
 		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, nullptr);
     }
         
