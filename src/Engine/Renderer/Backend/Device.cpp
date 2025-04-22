@@ -131,11 +131,18 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
         VkPhysicalDevice* phsDevices = (VkPhysicalDevice*)malloc(deviceCount * sizeof(VkPhysicalDevice));
         vkEnumeratePhysicalDevices(inst, &deviceCount, phsDevices);
+        Logger::Trace("Devices available: ");
+        for (int i = 0; i < deviceCount; ++i) {
+            vkGetPhysicalDeviceProperties(phsDevices[i], &deviceProperties);
+            printf("\t%s\n", deviceProperties.deviceName);
+        }
         for (int i = 0; i < deviceCount; i++) {
-            if (isDeviceSuitable(phsDevices[i], reqExt)) {
+            vkGetPhysicalDeviceFeatures(phsDevices[i], &deviceFeatures);
+            vkGetPhysicalDeviceProperties(phsDevices[i], &deviceProperties);
+            bool validGPU = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ||
+                deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+            if (isDeviceSuitable(phsDevices[i], reqExt) && validGPU) {
                 this->physicalDevice = phsDevices[i];
-                vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
-                vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
                 free(phsDevices);
                 return;
             }
