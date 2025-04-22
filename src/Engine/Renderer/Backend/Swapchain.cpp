@@ -23,26 +23,26 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
     Swapchain* Swapchain::Builder::Build(Device& device, const std::string& debugName) {
         SwapchainSupportInfo supportInfo = device.GetSwapchainSupport(windowSurface);
-		VkSurfaceFormatKHR finalFormat{};
-		for (const auto& availableFormat : supportInfo.formats) {
-			if (availableFormat.format == preferredFormat && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-				finalFormat = availableFormat;
-			}
-		}
+        VkSurfaceFormatKHR finalFormat{};
+        for (const auto& availableFormat : supportInfo.formats) {
+            if (availableFormat.format == preferredFormat && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+                finalFormat = availableFormat;
+            }
+        }
         if (finalFormat.format == VK_FORMAT_UNDEFINED) {
             Logger::Warning("Swapchain format %i is not available! Using fallback...", (int)preferredFormat);
             finalFormat = supportInfo.formats[0];
         }
         VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
         if (vsync == false) {
-			for (const auto& availablePresentMode : supportInfo.presentModes) {
-				if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+            for (const auto& availablePresentMode : supportInfo.presentModes) {
+                if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                     presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
-				} else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+                } else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
                     presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-				}
-			}
-		}
+                }
+            }
+        }
         return new Swapchain(device, presentMode, finalFormat, windowSurface, windowExtent,
             debugName, oldSwapchain);
     }
@@ -110,37 +110,37 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
         createInfo.oldSwapchain = VK_NULL_HANDLE;
-        if(oldSwapchain != nullptr){
+        if (oldSwapchain != nullptr){
             createInfo.oldSwapchain = oldSwapchain->swapchain;
         }
 
         vkCreateSwapchainKHR(device.GetDevice(), &createInfo, NULL, &swapchain);
-		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, nullptr);
     }
         
     void Swapchain::CreateImageViews() {
         std::vector<VkImage> swapchainImages{};
-		swapchainImages.resize(imageCount);
-		vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, swapchainImages.data());
+        swapchainImages.resize(imageCount);
+        vkGetSwapchainImagesKHR(device.GetDevice(), swapchain, &imageCount, swapchainImages.data());
 
         swapchainImageViews.resize(imageCount);
-		for (int i = 0; i < imageCount; ++i) {
-			VkImageViewCreateInfo imageViewCreateInfo = {};
-			imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			imageViewCreateInfo.format = surfaceFormat.format;
-			VkImageSubresourceRange subresourceRange{};
-			subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			subresourceRange.baseMipLevel = 0;
-			subresourceRange.levelCount = 1;
-			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = 1;
-			imageViewCreateInfo.subresourceRange = subresourceRange;
-			imageViewCreateInfo.image = swapchainImages[i];
-			if (vkCreateImageView(device.GetDevice(), &imageViewCreateInfo, nullptr, &swapchainImageViews[i]) != VK_SUCCESS) {
-				throw std::runtime_error("Failed to create image view!");
-			}
-		}
+        for (int i = 0; i < imageCount; ++i) {
+            VkImageViewCreateInfo imageViewCreateInfo = {};
+            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            imageViewCreateInfo.format = surfaceFormat.format;
+            VkImageSubresourceRange subresourceRange{};
+            subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            subresourceRange.baseMipLevel = 0;
+            subresourceRange.levelCount = 1;
+            subresourceRange.baseArrayLayer = 0;
+            subresourceRange.layerCount = 1;
+            imageViewCreateInfo.subresourceRange = subresourceRange;
+            imageViewCreateInfo.image = swapchainImages[i];
+            if (vkCreateImageView(device.GetDevice(), &imageViewCreateInfo, nullptr, &swapchainImageViews[i]) != VK_SUCCESS) {
+                throw std::runtime_error("Failed to create image view!");
+            }
+        }
     }
     void Swapchain::CreateRenderPass() {
         for (int i = 0; i < imageCount; ++i) {

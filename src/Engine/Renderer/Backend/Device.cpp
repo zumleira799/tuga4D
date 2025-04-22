@@ -115,12 +115,13 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     CommandPool* Device::RequestCommandPool() {
+        assert(false && "TODO");
         return nullptr;
     }
 
     void Device::ReleaseCommandPool(CommandPool* commandPool) {
         assert(commandPool != nullptr);
-
+        assert(false && "TODO");
     }
 
     void Device::pickPhysicalDevice(VkInstance inst, const std::vector<char*>&reqExt) {

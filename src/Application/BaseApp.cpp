@@ -58,8 +58,7 @@ namespace tuga4d::Application {
             //renderQueue->SubmitCommand();
             if (VkResult acquireResult = swapchain->AcquireNextImage(renderQueue->GetFrameIndex()); acquireResult == VK_SUCCESS) {
                 renderQueue->PresentSwapchain(swapchain);
-            }
-            else {
+            } else {
                 // resize logic
             }
             renderQueue->Flush();

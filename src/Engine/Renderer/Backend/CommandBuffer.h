@@ -7,6 +7,11 @@ namespace tuga4d::Engine::Renderer::Backend {
     public:
         CommandBuffer(Device& device, const std::string& debugName);
 
+        // Begin recording commands
+        void Begin();
+        // Stop recording
+        void End();
+
         VkCommandBuffer GetCommandBuffer() {
             return commandBuffer;
         }

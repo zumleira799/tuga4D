@@ -15,6 +15,17 @@ namespace tuga4d::Engine::Renderer::Backend {
         }
         CreateDebugInfo(debugName, reinterpret_cast<uint64_t>(commandBuffer), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT);
     }
+    void CommandBuffer::Begin() {
+        static VkCommandBufferBeginInfo beginInfo{ VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to record command buffer!");
+        }
+    }
+    void CommandBuffer::End() {
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to record command buffer!");
+        }
+    }
     CommandBuffer::~CommandBuffer() {
         vkFreeCommandBuffers(device.GetDevice(), owningCommandPool->GetCommandPool(), 1, &commandBuffer);
         device.ReleaseCommandPool(owningCommandPool);
