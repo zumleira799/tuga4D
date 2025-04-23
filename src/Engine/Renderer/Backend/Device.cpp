@@ -2,6 +2,7 @@
 #include "./DeviceObject.h"
 #include "./Instance.h"
 #include <Core/Logger.h>
+#include <Engine/Renderer/Backend/CommandPool.h>
 #include <stdexcept>
 #include <cassert>
 #include <cstring>
@@ -65,6 +66,12 @@ namespace tuga4d::Engine::Renderer::Backend {
 
     Device::~Device() {
         Logger::Trace("Destroying device %s", GetDeviceName());
+        CommandPool* cp = commandPoolList;
+        while(cp != NULL){
+            CommandPool* cp1 = cp->next;
+            delete cp;
+            cp = cp1;
+        }
         vkDestroyDevice(device, VK_NULL_HANDLE);
     }
     void Device::DestroyObject(DeviceObject* object) {
@@ -115,13 +122,18 @@ namespace tuga4d::Engine::Renderer::Backend {
     }
 
     CommandPool* Device::RequestCommandPool() {
-        assert(false && "TODO");
-        return nullptr;
+        CommandPool* cp = commandPoolList;
+        if(cp == nullptr){
+            cp = new CommandPool(*this, "");
+        }
+        commandPoolList = cp->next;
+        return cp;
     }
 
     void Device::ReleaseCommandPool(CommandPool* commandPool) {
         assert(commandPool != nullptr);
-        assert(false && "TODO");
+        commandPool->next = commandPoolList; 
+        commandPoolList = commandPool;
     }
 
     void Device::pickPhysicalDevice(VkInstance inst, const std::vector<char*>&reqExt) {
