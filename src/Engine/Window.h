@@ -9,13 +9,12 @@
 #include <Engine/Input/Dispatcher.h>
 
 #include <Engine/Renderer/Backend/Instance.h>
-#include <volk.h>
 
 #include <array>
 #include <variant>
 
 extern "C" {
-    typedef struct GLFWwindow;
+    typedef struct GLFWwindow GLFWwindow;
 }
 namespace tuga4d::Engine {
     class Window : NoCopy, NoMove {

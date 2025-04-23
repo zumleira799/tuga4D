@@ -37,10 +37,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         return *this;
     }
     ImageView* ImageView::Builder::Build(Device& device, const std::string& debugName) {
-        return new ImageView(device, debugName, createInfo);
+        return new ImageView(device, debugName, *image, createInfo);
     }
-    ImageView::ImageView(Device& device, const std::string& debugName, const VkImageViewCreateInfo& createInfo)
-        : DeviceObject(device), createInfo(createInfo) {
+    ImageView::ImageView(Device& device, const std::string& debugName, Image& image, const VkImageViewCreateInfo& createInfo)
+        : DeviceObject(device), createInfo(createInfo), imageRef(image) {
         VkResult result = vkCreateImageView(device.GetDevice(), &createInfo, nullptr, &imageView);
         if (result != VK_SUCCESS) {
             Logger::Error("Failed to create image view %s %p", GetDebugName(), this);

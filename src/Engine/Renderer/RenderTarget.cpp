@@ -3,7 +3,7 @@
 
 namespace tuga4d::Engine::Renderer {
     RenderTarget::Builder::Builder(Backend::ImageView& imageView, 
-        RenderTarget::Type type, VkImageLayout dstImageLayout) : dstImageLayout(dstImageLayout){
+        RenderTarget::Type type, VkImageLayout dstImageLayout) : dstImageLayout(dstImageLayout), view(&imageView) {
         attachmentInfo.imageView = imageView.GetImageView();
         switch (type) {
         case Type::Color:
@@ -59,10 +59,10 @@ namespace tuga4d::Engine::Renderer {
         return *this;
     }
     RenderTarget* RenderTarget::Builder::Build() {
-        return new RenderTarget(attachmentInfo, dstImageLayout);
+        return new RenderTarget(attachmentInfo, *view, dstImageLayout);
     }
-    RenderTarget::RenderTarget(VkRenderingAttachmentInfo attachmentInfo, VkImageLayout finalImageLayout)
-     : attachmentInfo(attachmentInfo), finalImageLayout(finalImageLayout) {
+    RenderTarget::RenderTarget(VkRenderingAttachmentInfo attachmentInfo, Backend::ImageView& view, VkImageLayout finalImageLayout)
+     : attachmentInfo(attachmentInfo), viewRef(view), finalImageLayout(finalImageLayout) {
 
     }
     RenderTarget::~RenderTarget() {

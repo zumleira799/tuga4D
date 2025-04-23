@@ -27,15 +27,23 @@ namespace tuga4d::Engine::Renderer {
         private:
             VkRenderingAttachmentInfo attachmentInfo{ VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO };
             VkImageLayout dstImageLayout;
+            Backend::ImageView* view;
         };
-        RenderTarget(VkRenderingAttachmentInfo attachmentInfo, VkImageLayout finalImageLayout);
+        RenderTarget(VkRenderingAttachmentInfo attachmentInfo, Backend::ImageView& view, VkImageLayout finalImageLayout);
         ~RenderTarget();
-       
-        VkRenderingAttachmentInfo GetAttachmentInfo() {
+
+        VkImageLayout GetTargetImageLayout() const {
+            return finalImageLayout;
+        }
+        const VkRenderingAttachmentInfo& GetAttachmentInfo() {
             return attachmentInfo;
+        }
+        Backend::ImageView& GetReferencingImageView() {
+            return viewRef;
         }
     private:
         VkRenderingAttachmentInfo attachmentInfo;
         VkImageLayout finalImageLayout;
+        Backend::ImageView& viewRef;
     };
 }

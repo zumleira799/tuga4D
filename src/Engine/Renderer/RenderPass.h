@@ -8,6 +8,7 @@ namespace tuga4d::Engine::Renderer {
     namespace Backend {
         class CommandBuffer;
     }
+    class RenderBarrier;
     class RenderTarget;
     class RenderPass {
     public:
@@ -18,8 +19,8 @@ namespace tuga4d::Engine::Renderer {
 
         void AddColorTarget(RenderTarget& colorTarget);
         void SetDepthTarget(RenderTarget& depthTarget);
-        void Begin(Backend::CommandBuffer* commandBuffer, VkExtent2D extent, VkOffset2D offset = VkOffset2D());
-        void End(Backend::CommandBuffer* commandBuffer);
+        void Begin(Backend::CommandBuffer& commandBuffer, VkExtent2D extent, VkOffset2D offset = VkOffset2D());
+        void End(Backend::CommandBuffer& commandBuffer);
     private:
         std::vector<VkRenderingAttachmentInfo> colorAttachments;
         VkRenderingAttachmentInfo depthAttachment;
@@ -28,5 +29,8 @@ namespace tuga4d::Engine::Renderer {
         std::string debugName;
 
         VkDebugMarkerMarkerInfoEXT debugMarkerInfo{ VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT };
+
+        RenderBarrier* inBarrier = nullptr;
+        RenderBarrier* outBarrier = nullptr;
     };
 }

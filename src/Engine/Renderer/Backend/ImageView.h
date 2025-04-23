@@ -15,14 +15,19 @@ namespace tuga4d::Engine::Renderer::Backend {
             VkImageViewCreateInfo createInfo{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
             Image* image;
         };
-        ImageView(Device& device, const std::string& debugName, const VkImageViewCreateInfo& createInfo);
+        ImageView(Device& device, const std::string& debugName, Image& image, const VkImageViewCreateInfo& createInfo);
 
         bool IsOk() const {
             return imageView != VK_NULL_HANDLE;
         }
-
         VkImageView GetImageView() {
             return imageView;
+        }
+        Image& GetReferencedImage() {
+            return imageRef;
+        }
+        const VkImageSubresourceRange& GetSubresourceRange() const {
+            return createInfo.subresourceRange;
         }
         VkImageViewType GetViewType() const {
             return createInfo.viewType;
@@ -47,5 +52,6 @@ namespace tuga4d::Engine::Renderer::Backend {
     private:
         VkImageViewCreateInfo createInfo;
         VkImageView imageView = VK_NULL_HANDLE;
+        Image& imageRef;
     };
 }

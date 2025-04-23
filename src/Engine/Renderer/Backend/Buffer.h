@@ -116,22 +116,22 @@ namespace tuga4d::Engine::Renderer::Backend {
             return (void*)((char*)mappedMemory + index * alignmentSize);
         }
 
-        VkDeviceSize getInstanceSize() const {
+        VkDeviceSize GetInstanceSize() const {
             return instanceSize; 
         }
-        VkDeviceSize getAlignmentSize() const { 
+        VkDeviceSize GetAlignmentSize() const { 
             return alignmentSize; 
         }
-        VkBufferUsageFlags getBufferUsageFlags() const { 
+        VkBufferUsageFlags GetBufferUsageFlags() const { 
             return bufferUsage; 
         }
-        VmaMemoryUsage getMemoryUsagelags() const { 
+        VmaMemoryUsage GetMemoryUsagelags() const { 
             return memoryUsage; 
         }
-        VkDeviceSize getBufferSize() const { 
+        VkDeviceSize GetBufferSize() const { 
             return bufferSize; 
         }
-        VkDeviceSize getIndexOffset(int index) const { 
+        VkDeviceSize GetIndexOffset(int index) const { 
             return index * alignmentSize; 
         }
 
