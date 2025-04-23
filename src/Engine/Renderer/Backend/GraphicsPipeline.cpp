@@ -18,7 +18,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 
     GraphicsPipeline* GraphicsPipeline::Builder::Build(Device& device, const std::string& debugName) {
         createInfo.pColorBlendState = &colorBlendState;
-
+        
         return new GraphicsPipeline(device, createInfo, debugName);
     }
 

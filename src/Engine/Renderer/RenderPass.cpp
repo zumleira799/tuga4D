@@ -40,6 +40,16 @@ namespace tuga4d::Engine::Renderer {
         renderInfo.renderArea.offset = offset;
         renderInfo.viewMask = 0;
         vkCmdBeginRendering(commandBuffer->GetCommandBuffer(), &renderInfo);
+
+        VkViewport viewport;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 0.0f;
+        viewport.x = offset.x;
+        viewport.y = offset.y;
+        viewport.width = extent.width;
+        viewport.height = extent.height;
+        vkCmdSetViewport(commandBuffer->GetCommandBuffer(), 0, 1, &viewport);
+        vkCmdSetScissor(commandBuffer->GetCommandBuffer(), 0, 1, &renderInfo.renderArea);
     }
     void RenderPass::End(CommandBuffer* commandBuffer) {
         vkCmdEndRendering(commandBuffer->GetCommandBuffer());
