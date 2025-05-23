@@ -13,15 +13,15 @@ namespace tuga4d::Engine::Renderer::Backend {
 
             static BlendInfo OpaqueBlend() {
                 return BlendInfo{
-                    VK_BLEND_OP_ADD, VK_BLEND_FACTOR_ONE, VK_BLEND_FACTOR_ZERO 
-                }
+                    VK_BLEND_OP_ADD, VK_BLEND_FACTOR_ONE, VK_BLEND_FACTOR_ZERO
+                };
             }
             static BlendInfo AlphaBlendColor() {
                 return BlendInfo{
-                    VK_BLEND_OP_ADD, VK_BLEND_FACTOR_SRC_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA 
-                }
+                    VK_BLEND_OP_ADD, VK_BLEND_FACTOR_SRC_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
+                };
             }
-        }
+        };
         struct Builder {
             Builder(uint32_t colorAttachmentCount);
 

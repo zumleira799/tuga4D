@@ -33,6 +33,12 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkDevice GetDevice() {
             return device;
         }
+        VkQueue GetQueue() {
+            return graphicsQueue;
+        }
+        uint32_t GetQueueFamilyIndex() {
+            return graphicsQueueFamilyIndex;
+        }
         VkPhysicalDevice GetPhysicalDevice() {
             return physicalDevice;
         }
@@ -53,6 +59,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDeviceFeatures deviceFeatures{};
         VkPhysicalDeviceProperties deviceProperties{};
         VkQueue graphicsQueue;
+        uint32_t graphicsQueueFamilyIndex;
 
         CommandPool* commandPoolList = nullptr;
 

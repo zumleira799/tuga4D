@@ -1,7 +1,8 @@
 #include "GraphicsPipeline.h"
 #include <Engine/Renderer/Backend/Device.h>
 #include <Engine/Renderer/Backend/CommandBuffer.h>
-#include <iostream>
+#include <fstream>
+#include <cassert>
 #include <stdexcept>
 
 namespace tuga4d::Engine::Renderer::Backend {
@@ -50,7 +51,7 @@ namespace tuga4d::Engine::Renderer::Backend {
 		colorBlendState.logicOpEnable = VK_FALSE;
 		colorBlendState.logicOp = VK_LOGIC_OP_COPY;  // Optional
 		colorBlendState.attachmentCount = colorAttachmentCount;
-		colorBlendState.pAttachments = colorBlendAttachments.data();
+		colorBlendState.pAttachments = colorAttachmentStates.data();
 		colorBlendState.blendConstants[0] = 0.0f;  // Optional
 		colorBlendState.blendConstants[1] = 0.0f;  // Optional
 		colorBlendState.blendConstants[2] = 0.0f;  // Optional
@@ -85,7 +86,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         const std::string& shaderFile, VkShaderStageFlagBits stage, Device& device) {
         VkPipelineShaderStageCreateInfo stageInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
         
-        std::ifstream reader{ shaderFile, std::ios::binary );
+        std::ifstream reader{ shaderFile, std::ios::binary };
         std::vector<char> shaderData(std::istreambuf_iterator<char>(reader), {});
         
         stageInfo.module = createShaderModule(shaderData, device);
@@ -108,9 +109,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         depthStencilState.depthCompareOp = depthCompare;
         return *this;
     }
-    GraphicsPipeline::Builder& GraphicsPipeline::Builder::SetMSAA(VkSampleCountFlagBits samples, bool alphaToCoverage = false){
+    GraphicsPipeline::Builder& GraphicsPipeline::Builder::SetMSAA(VkSampleCountFlagBits samples, bool alphaToCoverage){
         multisampleState.rasterizationSamples = samples;
-        multisampleState.alphaToCoverage = alphaToCoverage;
+        multisampleState.alphaToCoverageEnable = alphaToCoverage;
         multisampleState.sampleShadingEnable = samples > VK_SAMPLE_COUNT_1_BIT;
         return *this;
     }
@@ -178,7 +179,7 @@ namespace tuga4d::Engine::Renderer::Backend {
         
         GraphicsPipeline* pipeline = new GraphicsPipeline(device, createInfo, debugName);
 
-        for (VkShaderStage& stage : shaderStages) {
+        for (auto& stage : shaderStages) {
             vkDestroyShaderModule(device.GetDevice(), stage.module, nullptr);
         }
 
@@ -188,7 +189,7 @@ namespace tuga4d::Engine::Renderer::Backend {
     GraphicsPipeline::GraphicsPipeline(Device& device, const VkGraphicsPipelineCreateInfo& createInfo,
         const std::string& debugName) : DeviceObject(device) {
         
-        if (vkCreateGraphicsPipelines(device.GetDevice(), VK_NULL_HANDLE, 1, &createInfo, nullptr, &pipeline)) != VK_SUCCESS) {
+        if (vkCreateGraphicsPipelines(device.GetDevice(), VK_NULL_HANDLE, 1, &createInfo, nullptr, &pipeline) != VK_SUCCESS) {
             throw std::runtime_error("Failed to crate graphics pipeline!");
         }
         CreateDebugInfo(debugName, reinterpret_cast<uint64_t>(pipeline), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT);

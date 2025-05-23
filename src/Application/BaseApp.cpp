@@ -64,8 +64,8 @@ namespace tuga4d::Application {
                 int mt = renderQueue->GetFrameIndex();
                 cmB[mt]->Begin();
                 
-                swapchain->BeginRendering(cmB[mt]);
-                swapchain->EndRendering(cmB[mt]);
+                swapchain->BeginRendering(*cmB[mt]);
+                swapchain->EndRendering(*cmB[mt]);
 
                 cmB[mt]->End();
                 renderQueue->SubmitCommand(cmB[mt]);

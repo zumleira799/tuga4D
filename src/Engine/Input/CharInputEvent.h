@@ -7,7 +7,7 @@ namespace tuga4d::Engine::Input {
     public:
         using UnicodeCharacter = int;
         CharInputEvent(Window& sender, int unicode)
-        : Event(sender), Unicode(unicode) {}
+        : Event(sender), unicode(unicode) {}
 
         virtual EventType GetType() const override {
             return EventType::CharInput;

@@ -3,6 +3,7 @@
 #include <Engine/Renderer/Backend/Image.h>
 #include <Engine/Renderer/Backend/ImageView.h>
 #include <Engine/Renderer/Backend/Buffer.h>
+#include <cassert>
 
 namespace tuga4d::Engine::Renderer {
     RenderBarrier::RenderBarrier(const std::string& debugName) : debugName(debugName) {
