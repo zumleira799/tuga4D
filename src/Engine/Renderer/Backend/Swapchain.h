@@ -8,6 +8,7 @@ namespace tuga4d::Engine {
 }
 namespace tuga4d::Engine::Renderer::Backend {
     constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 2;
+    class CommandBuffer;
     class Swapchain : public DeviceObject {
     public:
         struct Builder {
@@ -30,8 +31,8 @@ namespace tuga4d::Engine::Renderer::Backend {
 
         VkResult AcquireNextImage(uint32_t frameIndex);
 
-        void BeginRendering();
-        void EndRendering();
+        void BeginRendering(CommandBuffer& commandBuffer);
+        void EndRendering(CommandBuffer& commandBuffer);
 
         bool IsOk() const {
             return swapchain != VK_NULL_HANDLE;

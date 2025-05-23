@@ -60,10 +60,13 @@ namespace tuga4d::Application {
             OnFrame(deltaTime);
 
             renderQueue->WaitFences();
-            //renderQueue->SubmitCommand();
             if (VkResult acquireResult = swapchain->AcquireNextImage(renderQueue->GetFrameIndex()); acquireResult == VK_SUCCESS) {
                 int mt = renderQueue->GetFrameIndex();
                 cmB[mt]->Begin();
+                
+                swapchain->BeginRendering(cmB[mt]);
+                swapchain->EndRendering(cmB[mt]);
+
                 cmB[mt]->End();
                 renderQueue->SubmitCommand(cmB[mt]);
                 renderQueue->PresentSwapchain(swapchain);

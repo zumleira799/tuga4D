@@ -6,10 +6,38 @@ namespace tuga4d::Engine::Renderer::Backend {
     class CommandBuffer;
     class GraphicsPipeline : public DeviceObject {
     public:
-        struct Builder {
-            Builder();
+        struct BlendInfo {
+            BlendInfo() = default;
+            VkBlendOp blendOp{};
+            VkBlendFactor srcFactor{}, dstFactor{};
 
-            Builder& AddShaderStage(const std::string& shaderFile, VkShaderStageFlagBits stage);
+            static BlendInfo OpaqueBlend() {
+                return BlendInfo{
+                    VK_BLEND_OP_ADD, VK_BLEND_FACTOR_ONE, VK_BLEND_FACTOR_ZERO 
+                }
+            }
+            static BlendInfo AlphaBlendColor() {
+                return BlendInfo{
+                    VK_BLEND_OP_ADD, VK_BLEND_FACTOR_SRC_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA 
+                }
+            }
+        }
+        struct Builder {
+            Builder(uint32_t colorAttachmentCount);
+
+            Builder& AddShaderStage(const std::string& shaderFile, VkShaderStageFlagBits stage, Device& device);
+            VkShaderModule createShaderModule(const std::vector<char>& code, Device& device);
+
+            Builder& SetDepthStencil(bool depthTest, bool depthWrite, bool stencilTest);
+            Builder& SetDepthCompare(VkCompareOp depthCompare);
+            Builder& SetMSAA(VkSampleCountFlagBits samples, bool alphaToCoverage = false);
+            Builder& AddVertexAttribute(const VkVertexInputAttributeDescription& description);
+            Builder& AddVertexBinding(const VkVertexInputBindingDescription& description);
+
+            Builder& SetColorWriteMask(size_t colorAttachment, VkColorComponentFlags components);
+            Builder& SetBlendEnabled(size_t colorAttachment, bool enabled);
+            Builder& SetColorBlendOp(size_t colorAttachment, const BlendInfo& blendInfo);
+            Builder& SetAlphaBlendOp(size_t colorAttachment, const BlendInfo& blendInfo);
 
             GraphicsPipeline* Build(Device& device, const std::string& debugName);
         private:

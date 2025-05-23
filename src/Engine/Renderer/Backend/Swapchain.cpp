@@ -1,5 +1,6 @@
 #include "Swapchain.h"
 #include <Engine/Renderer/Backend/Device.h>
+#include <Engine/Renderer/Backend/CommandBuffer.h>
 #include <Engine/Window.h>
 #include <Core/Logger.h>
 #include <cassert>
@@ -58,6 +59,13 @@ namespace tuga4d::Engine::Renderer::Backend {
         
         CreateDebugInfo(debugName, (uint64_t)swapchain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT);
     }
+    Swapchain::~Swapchain() {
+        for (int i = 0; i < imageCount; ++i) {
+            vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphore[i], nullptr);
+            vkDestroyImageView(device.GetDevice(), swapchainImageViews[i], nullptr);
+        }
+        vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
+    }
     VkResult Swapchain::AcquireNextImage(uint32_t frameIndex) {
         VkAcquireNextImageInfoKHR acquireInfo{ VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR };
         acquireInfo.swapchain = swapchain;
@@ -67,20 +75,24 @@ namespace tuga4d::Engine::Renderer::Backend {
         acquireInfo.fence = VK_NULL_HANDLE;
         return vkAcquireNextImage2KHR(device.GetDevice(), &acquireInfo, &imageIndex);
     }
-    void Swapchain::BeginRendering() {
-        // FIXME
-        // vkCmdBeginRendering();
+    void Swapchain::BeginRendering(CommandBuffer& commandBuffer) {
+        VkRenderingInfo renderInfo{};
+        renderInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+        renderInfo.renderArea.offset = {0, 0};
+        renderInfo.renderArea.extent = windowExtent;
+        renderInfo.layerCount = 1;
+        renderInfo.viewMask = 0;
+        renderInfo.colorAttachmentCount = 1;
+        renderInfo.pColorAttachments = swapchainAttachments.data()+imageIndex;
+        
+        
+
+        //vkCmdBeginRendering();
+        
     }
-    void Swapchain::EndRendering() {
+    void Swapchain::EndRendering(CommandBuffer& commandBuffer) {
         // FIXME
         // vkCmdEndRendering();
-    }
-    Swapchain::~Swapchain() {
-        for (int i = 0; i < imageCount; ++i) {
-            vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphore[i], nullptr);
-            vkDestroyImageView(device.GetDevice(), swapchainImageViews[i], nullptr);
-        }
-        vkDestroySwapchainKHR(device.GetDevice(), swapchain, nullptr);
     }
     void Swapchain::CreateSemaphores() {
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
@@ -145,11 +157,13 @@ namespace tuga4d::Engine::Renderer::Backend {
     void Swapchain::CreateRenderPass() {
         for (int i = 0; i < imageCount; ++i) {
             VkRenderingAttachmentInfo attachmentInfo{VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO};
-            attachmentInfo.clearValue.color = { 0, 0, 0, 0 };
+            attachmentInfo.clearValue.color = { 1, 0, 1, 1 };
             attachmentInfo.imageView = swapchainImageViews[i];
             attachmentInfo.imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
             attachmentInfo.resolveMode = VK_RESOLVE_MODE_NONE;
-            //attachmentInfo.
+            attachmentInfo.resolveImageView = VK_NULL_HANDLE;
+            attachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            attachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
             swapchainAttachments.push_back(attachmentInfo);
         }
     }
