@@ -45,13 +45,38 @@ namespace tuga4d::Engine::Renderer::Backend {
         free(dExtProp);
         return true;
     }
+    /*
+        MSAA,
+        Anisotropic filtering
+        Wireframe
+        Independent alpha blend
+        dynamic rendering
+    */
+    static bool checkDeviceFeatureSupport(VkPhysicalDevice physD, const VkPhysicalDeviceFeatures& feats) {
+        VkPhysicalDeviceDynamicRenderingFeatures dynRenderingFeats{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES };
+        VkPhysicalDeviceFeatures2 feats2;
+        feats2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        feats2.pNext = &dynRenderingFeats;
+        vkGetPhysicalDeviceFeatures2(physD, &feats2);
+        return dynRenderingFeats.dynamicRendering && feats.sampleRateShading
+            && feats.fillModeNonSolid && feats.samplerAnisotropy && feats.wideLines && feats.independentBlend;
+    }
+    static void enableDeviceFeatures(VkPhysicalDeviceFeatures* feats) {
+        feats->sampleRateShading = true;
+        feats->fillModeNonSolid = true;
+        feats->samplerAnisotropy = true;
+        feats->wideLines = true;
+        feats->independentBlend = true;
+    }
 
-    static bool isDeviceSuitable(VkPhysicalDevice dev1, const std::vector<char*>&reqExt) {
+
+    static bool isDeviceSuitable(VkPhysicalDevice dev1, const std::vector<char*>&reqExt, const VkPhysicalDeviceFeatures& features) {
         uint32_t index;
         bool fnd = findQueueFamilies(dev1, &index);
         bool iS = checkDeviceExtensionSupport(dev1, reqExt);
+        bool iF = checkDeviceFeatureSupport(dev1, features);
         //figure out what to do with querying for swapchain support later
-        return fnd && iS;
+        return fnd && iF&& iS;
     }
 
     Device::Device(Instance& instance, const std::vector<char*>&reqExt) : cInstance(instance) {
@@ -150,12 +175,14 @@ namespace tuga4d::Engine::Renderer::Backend {
             printf("\t%s\n", deviceProperties.deviceName);
         }
         for (int i = 0; i < deviceCount; i++) {
+            VkPhysicalDeviceFeatures deviceFeatures;
             vkGetPhysicalDeviceFeatures(phsDevices[i], &deviceFeatures);
             vkGetPhysicalDeviceProperties(phsDevices[i], &deviceProperties);
             //bool validGPU = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ||
             //    deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
-            if (isDeviceSuitable(phsDevices[i], reqExt) /* && validGPU*/) {
+            if (isDeviceSuitable(phsDevices[i], reqExt, deviceFeatures) /* && validGPU*/) {
                 this->physicalDevice = phsDevices[i];
+                enableDeviceFeatures(&enabledDeviceFeatures);
                 free(phsDevices);
                 return;
             }
@@ -181,7 +208,12 @@ namespace tuga4d::Engine::Renderer::Backend {
 
         deviceCreateInfo.enabledExtensionCount = reqExt.size();
         deviceCreateInfo.ppEnabledExtensionNames = reqExt.data();
-        deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
+        deviceCreateInfo.pEnabledFeatures = &enabledDeviceFeatures;
+
+        dynamicRenderingFeatures.dynamicRendering = VK_TRUE;
+        VkPhysicalDeviceFeatures2 feats2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+        feats2.pNext = &dynamicRenderingFeatures;
+        deviceCreateInfo.pNext = &feats2;
 
         vkCreateDevice(physicalDevice, &deviceCreateInfo, NULL, &device);
 

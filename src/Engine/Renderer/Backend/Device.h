@@ -56,7 +56,9 @@ namespace tuga4d::Engine::Renderer::Backend {
         VkPhysicalDevice physicalDevice;
         VkDevice device;
         VmaAllocator memoryAllocator = nullptr;
-        VkPhysicalDeviceFeatures deviceFeatures{};
+        VkPhysicalDeviceFeatures enabledDeviceFeatures{ };
+        VkPhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES };
+
         VkPhysicalDeviceProperties deviceProperties{};
         VkQueue graphicsQueue;
         uint32_t graphicsQueueFamilyIndex;
