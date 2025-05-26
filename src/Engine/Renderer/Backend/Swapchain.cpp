@@ -4,6 +4,7 @@
 #include <Engine/Window.h>
 #include <Core/Logger.h>
 #include <cassert>
+#include <Engine/Renderer/RenderBarrier.h>
 
 namespace tuga4d::Engine::Renderer::Backend {
     Swapchain::Builder::Builder(Window& window) {
@@ -85,14 +86,10 @@ namespace tuga4d::Engine::Renderer::Backend {
         renderInfo.colorAttachmentCount = 1;
         renderInfo.pColorAttachments = swapchainAttachments.data()+imageIndex;
         
-        
-
-        //vkCmdBeginRendering();
-        
+        vkCmdBeginRendering(commandBuffer.GetCommandBuffer(), &renderInfo);
     }
     void Swapchain::EndRendering(CommandBuffer& commandBuffer) {
-        // FIXME
-        // vkCmdEndRendering();
+        vkCmdEndRendering(commandBuffer.GetCommandBuffer());
     }
     void Swapchain::CreateSemaphores() {
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {

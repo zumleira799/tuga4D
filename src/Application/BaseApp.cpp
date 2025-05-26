@@ -62,14 +62,16 @@ namespace tuga4d::Application {
             renderQueue->WaitFences();
             if (VkResult acquireResult = swapchain->AcquireNextImage(renderQueue->GetFrameIndex()); acquireResult == VK_SUCCESS) {
                 int mt = renderQueue->GetFrameIndex();
-                cmB[mt]->Begin();
+                CommandBuffer& cmb = *cmB[mt];
+                cmb.Begin();
                 
-                swapchain->BeginRendering(*cmB[mt]);
-                swapchain->EndRendering(*cmB[mt]);
+                swapchain->BeginRendering(cmb);
 
-                cmB[mt]->End();
-                renderQueue->SubmitCommand(cmB[mt]);
-                renderQueue->PresentSwapchain(swapchain);
+                swapchain->EndRendering(cmb);
+
+                cmb.End();
+                renderQueue->SubmitCommand(cmb);
+                renderQueue->PresentSwapchain(*swapchain);
             } else {
                 // resize logic
             }

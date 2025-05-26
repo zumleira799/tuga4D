@@ -11,8 +11,8 @@ namespace tuga4d::Engine::Renderer {
         ~RenderQueue();
 
         void WaitFences();
-        void SubmitCommand(Backend::CommandBuffer* command);
-        void PresentSwapchain(Backend::Swapchain* swapchain);
+        void SubmitCommand(Backend::CommandBuffer& command);
+        void PresentSwapchain(Backend::Swapchain& swapchain);
 
         void Flush();
 

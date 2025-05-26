@@ -25,15 +25,15 @@ namespace tuga4d::Engine::Renderer {
             UINT64_MAX
         );
     }
-    void RenderQueue::SubmitCommand(Backend::CommandBuffer* command) {
-        assert(command->IsOk());
-        submittedCommands.push_back(command->GetCommandBuffer());
+    void RenderQueue::SubmitCommand(Backend::CommandBuffer& command) {
+        assert(command.IsOk());
+        submittedCommands.push_back(command.GetCommandBuffer());
     }
-    void RenderQueue::PresentSwapchain(Backend::Swapchain* swapchain) {
-        assert(swapchain->IsOk());
-        submittedSwapchains.push_back(swapchain->GetSwapchain());
-        awaitImageAvailableSemaphores.push_back(swapchain->GetCurrentWaitSemaphore());
-        imageIndices.push_back(swapchain->GetImageIndex());
+    void RenderQueue::PresentSwapchain(Backend::Swapchain& swapchain) {
+        assert(swapchain.IsOk());
+        submittedSwapchains.push_back(swapchain.GetSwapchain());
+        awaitImageAvailableSemaphores.push_back(swapchain.GetCurrentWaitSemaphore());
+        imageIndices.push_back(swapchain.GetImageIndex());
     }
 
     void RenderQueue::Flush() {
