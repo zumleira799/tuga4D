@@ -5,27 +5,59 @@
 #include <cstdlib>
 
 namespace tuga4d::Engine::Renderer::Backend {
+    class CommandBuffer;
+
     enum class BufferMemoryUsage {
         Auto = 0,
         Host, CPU = Host,
         Device, GPU = Device
     };
+
     class Buffer : public DeviceObject {
     public:
         static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
         struct Builder {
-            Builder();
+            Builder(VkDeviceSize instanceSize, uint32_t instanceCount);
             
             Builder& SetMemoryUsage(BufferMemoryUsage usage);
             Builder& AddUsageFlags(VkBufferUsageFlags usages);
+            Builder& PersistenlyMap();
+            Builder& ForceDedicatedMemory();
             Buffer* Build(Device& device, const std::string& debugName);
         private:
             VkBufferCreateInfo createInfo{ VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
             VmaMemoryUsage memoryUsage;
+            VmaAllocationCreateFlags allocationFlags;
+            uint32_t instanceCount;
         };
-        Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage);
+
+        struct CopyBufferToBufferBuilder {
+            CopyBufferToBufferBuilder(Buffer& other, VkDeviceSize size);
+
+            CopyBufferToBufferBuilder& SetSrcOffset(VkDeviceSize offset);
+            CopyBufferToBufferBuilder& SetDstOffset(VkDeviceSize offset);
+
+            CopyBufferToBufferBuilder& NextRegion(Buffer& other, VkDeviceSize size);
+
+            void Copy(CommandBuffer& commandBuffer);
+        private:
+            std::vector<VkBufferCopy> copyRegions{};
+        };
+
+        struct CopyBufferToImageBuilder {
+            CopyBufferToImageBuilder(Buffer& other);
+
+        private:
+            Buffer* buffer;
+        };
+
+        Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage,
+            VmaAllocationCreateFlags allocFlags, uint32_t instanceCount);
         
+        CopyBufferToBufferBuilder CopyToBuffer(Buffer& other, VkDeviceSize size);
+        CopyBufferToImageBuilder CopyToImage(Buffer& other);
+
         /**
          * Map a memory range of this buffer. If successful, mapped points to the specified buffer range.
          *

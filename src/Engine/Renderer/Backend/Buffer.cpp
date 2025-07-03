@@ -11,7 +11,8 @@ namespace tuga4d::Engine::Renderer::Backend {
         return instanceSize;
     }
 
-    Buffer::Builder::Builder() {
+    Buffer::Builder::Builder(VkDeviceSize instanceSize, uint32_t instanceCount) : instanceCount(instanceCount){
+        createInfo.size = instanceSize * instanceCount;
     }
 
     Buffer::Builder& Buffer::Builder::SetMemoryUsage(BufferMemoryUsage usage) {
@@ -34,27 +35,40 @@ namespace tuga4d::Engine::Renderer::Backend {
         createInfo.usage |= usages;
         return *this;
     }
-    Buffer* Buffer::Builder::Build(Device& device, const std::string& debugName) {
-        return new Buffer(device, debugName, createInfo, memoryUsage);
+    Buffer::Builder& Buffer::Builder::PersistenlyMap() {
+        allocationFlags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        return *this;
     }
-    Buffer::Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage)
+    Buffer::Builder& Buffer::Builder::ForceDedicatedMemory() {
+        allocationFlags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+        return *this;
+    }
+    Buffer* Buffer::Builder::Build(Device& device, const std::string& debugName) {
+        return new Buffer(device, debugName, createInfo, memoryUsage, allocationFlags, instanceCount);
+    }
+    Buffer::Buffer(Device& device, const std::string& debugName, const VkBufferCreateInfo& createInfo, VmaMemoryUsage memoryUsage,
+        VmaAllocationCreateFlags allocFlags, uint32_t instanceCount)
         : DeviceObject(device) {
-        // hey vasco, it's me tristan, i actually forgot what this is for, 
-        // but im pretty sure you dont ever need it to be anything other than 1
-        VkDeviceSize minOffsetAlignment = 1;
+
+        instanceSize = createInfo.size / static_cast<VkDeviceSize>(instanceCount);
+        assert(instanceSize * instanceCount == createInfo.size);
+
+        VkDeviceSize minOffsetAlignment = 1; // if this casues validation errors when using funky offsets then lmn
         alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
         bufferSize = alignmentSize * instanceCount;
 
         this->memoryUsage = memoryUsage;
         // TODO, unlike images, buffers make sense to allocate host side. Make sure to implement properly.
-        VmaAllocationCreateInfo allocInfo{};
-        allocInfo.usage = memoryUsage;
-        assert(false && "FIXME");
-
-        VkResult result = vmaCreateBuffer(device.GetMemoryAllocator(), &createInfo, &allocInfo, &buffer, &memory, nullptr);
+        VmaAllocationCreateInfo allocCreate{};
+        allocCreate.usage = memoryUsage;
+        allocCreate.memoryTypeBits = UINT32_MAX;
+        allocCreate.flags = allocFlags;
+        VmaAllocationInfo allocInfo;
+        VkResult result = vmaCreateBuffer(device.GetMemoryAllocator(), &createInfo, &allocCreate, &buffer, &memory, &allocInfo);
         if (result != VK_SUCCESS) {
             Logger::Error("Failed to create buffer %s %p", GetDebugName(), this);
         }
+        mappedMemory = allocInfo.pMappedData;
         CreateDebugInfo(debugName, (uint64_t)buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT);
     }
     Buffer::~Buffer() {
@@ -112,12 +126,25 @@ namespace tuga4d::Engine::Renderer::Backend {
     void Buffer::WriteToIndex(const void* data, int index, VkDeviceSize offset, VkDeviceSize size) {
         WriteToBuffer(data, index * alignmentSize + offset, size);
     }
-
     VkResult Buffer::FlushIndex(int index) { 
         return Flush(index * alignmentSize, alignmentSize); 
     }
 
     VkResult Buffer::InvalidateIndex(int index) {
         return Invalidate(index * alignmentSize, alignmentSize);
+    }
+    Buffer::CopyBufferToBufferBuilder::CopyBufferToBufferBuilder(Buffer& other, VkDeviceSize size) {
+
+    }
+    Buffer::CopyBufferToBufferBuilder& Buffer::CopyBufferToBufferBuilder::SetSrcOffset(VkDeviceSize offset) {
+        // TODO: insert return statement here
+    }
+    Buffer::CopyBufferToBufferBuilder& Buffer::CopyBufferToBufferBuilder::SetDstOffset(VkDeviceSize offset) {
+        // TODO: insert return statement here
+    }
+    Buffer::CopyBufferToBufferBuilder& Buffer::CopyBufferToBufferBuilder::NextRegion(Buffer& other, VkDeviceSize size) {
+        // TODO: insert return statement here
+    }
+    void Buffer::CopyBufferToBufferBuilder::Copy(CommandBuffer& commandBuffer) {
     }
 }
